@@ -234,17 +234,19 @@ namespace EffekseerRenderer
 				for (auto sploop = 0; sploop < parameter.SplineDivision; sploop++)
 				{
 					bool isFirst = param.InstanceIndex == 0 && sploop == 0;
-					bool isLast = param.InstanceIndex == (param.InstanceCount - 1) && sploop == parameter.SplineDivision - 1;
+					bool isLast = param.InstanceIndex == (param.InstanceCount - 1);
 
 					VERTEX* verteies = (VERTEX*)m_ringBufferData;
+
+					float percent_instance = sploop / (float)parameter.SplineDivision;
 
 					if (parameter.SplineDivision > 1)
 					{
 						verteies[0].Pos = spline_left.GetValue(param.InstanceIndex + sploop / (float)parameter.SplineDivision);
 						verteies[1].Pos = spline_right.GetValue(param.InstanceIndex + sploop / (float)parameter.SplineDivision);
 
-						verteies[0].SetColor(param.Colors[0]);
-						verteies[1].SetColor(param.Colors[1]);
+						verteies[0].SetColor(Effekseer::Color::Lerp(param.Colors[0], param.Colors[2], percent_instance));
+						verteies[1].SetColor(Effekseer::Color::Lerp(param.Colors[1], param.Colors[3], percent_instance));
 					}
 					else
 					{
