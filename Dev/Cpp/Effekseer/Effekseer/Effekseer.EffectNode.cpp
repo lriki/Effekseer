@@ -432,6 +432,9 @@ void EffectNodeImplemented::LoadParameter(unsigned char*& pos, EffectNode* paren
 			memcpy(&DepthValues.SoftParticle, pos, sizeof(float));
 			pos += sizeof(float);
 
+			memcpy(&DepthValues.LOD, pos, sizeof(float));
+			pos += sizeof(float);
+
 			DepthValues.DepthOffset *= m_effect->GetMaginification();
 			DepthValues.SoftParticle *= m_effect->GetMaginification();
 		}

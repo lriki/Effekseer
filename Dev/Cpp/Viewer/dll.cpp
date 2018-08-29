@@ -681,6 +681,7 @@ bool Native::UpdateWindow()
 		::Effekseer::Matrix44 cameraMat;
 		g_renderer->GetRenderer()->SetCameraMatrix( 
 			::Effekseer::Matrix44().LookAtRH( position, g_focus_position, ::Effekseer::Vector3D( 0.0f, 1.0f, 0.0f ) ) );
+		g_manager->SetCameraMatrix(g_renderer->GetRenderer()->GetCameraMatrix());
 	}
 	else
 	{
@@ -698,6 +699,8 @@ bool Native::UpdateWindow()
 		::Effekseer::Matrix44 cameraMat;
 		g_renderer->GetRenderer()->SetCameraMatrix( 
 			::Effekseer::Matrix44().LookAtLH( position, temp_focus, ::Effekseer::Vector3D( 0.0f, 1.0f, 0.0f ) ) );
+		g_manager->SetCameraMatrix(g_renderer->GetRenderer()->GetCameraMatrix());
+
 	}
 
 	g_sound->SetListener( position, g_focus_position, ::Effekseer::Vector3D( 0.0f, 1.0f, 0.0f ) );

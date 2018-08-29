@@ -1300,6 +1300,11 @@ void ManagerImplemented::Update( float deltaFrame )
 	{
 		DrawSet& drawSet = m_renderingDrawSets[i];
 		
+		// Fxxx Bad code
+		Vector3D pos;
+		drawSet.GlobalMatrix.GetTranslation(pos);
+		EffectDistance = Vector3D::Dot(cameraLocalPos - pos, cameraFrontDirection);
+
 		UpdateHandle( drawSet, deltaFrame );
 	}
 
@@ -1342,6 +1347,11 @@ void ManagerImplemented::UpdateHandle( Handle handle, float deltaFrame )
 	{
 		DrawSet& drawSet = it->second;
 
+		// Fxxx Bad code
+		Vector3D pos;
+		drawSet.GlobalMatrix.GetTranslation(pos);
+		EffectDistance = Vector3D::Dot(cameraLocalPos - pos, cameraFrontDirection);
+
 		UpdateHandle( drawSet, deltaFrame );
 	}
 }
@@ -1352,6 +1362,11 @@ void ManagerImplemented::UpdateHandle( Handle handle, float deltaFrame )
 void ManagerImplemented::UpdateHandle( DrawSet& drawSet, float deltaFrame )
 {
 	float df = drawSet.IsPaused ? 0 : deltaFrame * drawSet.Speed;
+
+	// Fxxx Bad code
+	Vector3D pos;
+	drawSet.GlobalMatrix.GetTranslation(pos);
+	EffectDistance = Vector3D::Dot(cameraLocalPos - pos, cameraFrontDirection);
 
 	drawSet.InstanceContainerPointer->Update( true, df, drawSet.IsShown );
 
@@ -1379,17 +1394,25 @@ void ManagerImplemented::Draw()
 		{
 			DrawSet& drawSet = *m_culledObjects[i];
 
+			// Fxxx Bad code
+			Vector3D pos;
+			drawSet.GlobalMatrix.GetTranslation(pos);
+			EffectDistance = Vector3D::Dot(cameraLocalPos - pos, cameraFrontDirection);
+
 			if( drawSet.IsShown && drawSet.IsAutoDrawing )
 			{
 				if (drawSet.GlobalPointer->RenderedInstanceContainers.size() > 0)
 				{
 					for (auto& c : drawSet.GlobalPointer->RenderedInstanceContainers)
 					{
+						if (c->m_pEffectNode->DepthValues.LOD < EffectDistance) continue;
 						c->Draw(false);
 					}
 				}
 				else
 				{
+					if (drawSet.InstanceContainerPointer->m_pEffectNode->DepthValues.LOD < EffectDistance) continue;
+
 					drawSet.InstanceContainerPointer->Draw( true );
 				}
 			}
@@ -1401,17 +1424,26 @@ void ManagerImplemented::Draw()
 		{
 			DrawSet& drawSet = m_renderingDrawSets[i];
 
+			// Fxxx Bad code
+			Vector3D pos;
+			drawSet.GlobalMatrix.GetTranslation(pos);
+			EffectDistance = Vector3D::Dot(cameraLocalPos - pos, cameraFrontDirection);
+
 			if( drawSet.IsShown && drawSet.IsAutoDrawing )
 			{
 				if (drawSet.GlobalPointer->RenderedInstanceContainers.size() > 0)
 				{
+					
 					for (auto& c : drawSet.GlobalPointer->RenderedInstanceContainers)
 					{
+						if (c->m_pEffectNode->DepthValues.LOD < EffectDistance) continue;
 						c->Draw(false);
 					}
 				}
 				else
 				{
+					if (drawSet.InstanceContainerPointer->m_pEffectNode->DepthValues.LOD < EffectDistance) continue;
+
 					drawSet.InstanceContainerPointer->Draw(true);
 				}
 			}
@@ -1437,11 +1469,18 @@ void ManagerImplemented::DrawBack()
 		{
 			DrawSet& drawSet = *m_culledObjects[i];
 
+			// Fxxx Bad code
+			Vector3D pos;
+			drawSet.GlobalMatrix.GetTranslation(pos);
+			EffectDistance = Vector3D::Dot(cameraLocalPos - pos, cameraFrontDirection);
+
 			if (drawSet.IsShown && drawSet.IsAutoDrawing)
 			{
 				auto e = (EffectImplemented*)drawSet.ParameterPointer;
 				for (int32_t j = 0; j < e->renderingNodesThreshold; j++)
 				{
+					if (drawSet.GlobalPointer->RenderedInstanceContainers[j]->m_pEffectNode->DepthValues.LOD < EffectDistance) continue;
+
 					drawSet.GlobalPointer->RenderedInstanceContainers[j]->Draw(false);
 				}
 			}
@@ -1453,11 +1492,18 @@ void ManagerImplemented::DrawBack()
 		{
 			DrawSet& drawSet = m_renderingDrawSets[i];
 
+			// Fxxx Bad code
+			Vector3D pos;
+			drawSet.GlobalMatrix.GetTranslation(pos);
+			EffectDistance = Vector3D::Dot(cameraLocalPos - pos, cameraFrontDirection);
+
 			if (drawSet.IsShown && drawSet.IsAutoDrawing)
 			{
 				auto e = (EffectImplemented*)drawSet.ParameterPointer;
 				for (int32_t j = 0; j < e->renderingNodesThreshold; j++)
 				{
+					if (drawSet.GlobalPointer->RenderedInstanceContainers[j]->m_pEffectNode->DepthValues.LOD < EffectDistance) continue;
+
 					drawSet.GlobalPointer->RenderedInstanceContainers[j]->Draw(false);
 				}
 			}
@@ -1481,6 +1527,11 @@ void ManagerImplemented::DrawFront()
 		{
 			DrawSet& drawSet = *m_culledObjects[i];
 
+			// Fxxx Bad code
+			Vector3D pos;
+			drawSet.GlobalMatrix.GetTranslation(pos);
+			EffectDistance = Vector3D::Dot(cameraLocalPos - pos, cameraFrontDirection);
+
 			if (drawSet.IsShown && drawSet.IsAutoDrawing)
 			{
 				if (drawSet.GlobalPointer->RenderedInstanceContainers.size() > 0)
@@ -1488,11 +1539,15 @@ void ManagerImplemented::DrawFront()
 					auto e = (EffectImplemented*)drawSet.ParameterPointer;
 					for (int32_t j = e->renderingNodesThreshold; j < drawSet.GlobalPointer->RenderedInstanceContainers.size(); j++)
 					{
+						if (drawSet.GlobalPointer->RenderedInstanceContainers[j]->m_pEffectNode->DepthValues.LOD < EffectDistance) continue;
+
 						drawSet.GlobalPointer->RenderedInstanceContainers[j]->Draw(false);
 					}
 				}
 				else
 				{
+					if (drawSet.InstanceContainerPointer->m_pEffectNode->DepthValues.LOD < EffectDistance) continue;
+
 					drawSet.InstanceContainerPointer->Draw(true);
 				}
 			}
@@ -1504,6 +1559,11 @@ void ManagerImplemented::DrawFront()
 		{
 			DrawSet& drawSet = m_renderingDrawSets[i];
 
+			// Fxxx Bad code
+			Vector3D pos;
+			drawSet.GlobalMatrix.GetTranslation(pos);
+			EffectDistance = Vector3D::Dot(cameraLocalPos - pos, cameraFrontDirection);
+
 			if (drawSet.IsShown && drawSet.IsAutoDrawing)
 			{
 				if (drawSet.GlobalPointer->RenderedInstanceContainers.size() > 0)
@@ -1511,11 +1571,15 @@ void ManagerImplemented::DrawFront()
 					auto e = (EffectImplemented*)drawSet.ParameterPointer;
 					for (int32_t j = e->renderingNodesThreshold; j < drawSet.GlobalPointer->RenderedInstanceContainers.size(); j++)
 					{
+						if (drawSet.GlobalPointer->RenderedInstanceContainers[j]->m_pEffectNode->DepthValues.LOD < EffectDistance) continue;
+
 						drawSet.GlobalPointer->RenderedInstanceContainers[j]->Draw(false);
 					}
 				}
 				else
 				{
+					if (drawSet.InstanceContainerPointer->m_pEffectNode->DepthValues.LOD < EffectDistance) continue;
+
 					drawSet.InstanceContainerPointer->Draw(true);
 				}
 			}
@@ -1816,6 +1880,18 @@ void ManagerImplemented::RessignCulling()
 	m_culledObjectSets.clear();
 
 	m_cullingWorld->Reassign();
+}
+
+void ManagerImplemented::SetCameraMatrix(const Matrix44& cameraMat)
+{
+	this->cameraMat = cameraMat;
+
+	auto mat = cameraMat;
+
+	cameraFrontDirection = ::Effekseer::Vector3D(mat.Values[0][2], mat.Values[1][2], mat.Values[2][2]);
+
+	cameraLocalPos = ::Effekseer::Vector3D(-mat.Values[3][0], -mat.Values[3][1], -mat.Values[3][2]);
+
 }
 
 //----------------------------------------------------------------------------------

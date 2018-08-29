@@ -9,6 +9,7 @@
 #include "Effekseer.Manager.h"
 #include "Effekseer.Matrix43.h"
 #include "Effekseer.Matrix44.h"
+#include "Effekseer.Vector3D.h"
 #include "Culling/Culling3D.h"
 
 //----------------------------------------------------------------------------------
@@ -193,6 +194,12 @@ private:
 	// ランダム関数最大値
 	int			m_randMax;
 
+	Matrix44	cameraMat;
+
+	Vector3D	cameraFrontDirection;
+
+	Vector3D	cameraLocalPos;
+
 	// 描画オブジェクト追加
 	Handle AddDrawSet( Effect* effect, InstanceContainer* pInstanceContainer, InstanceGlobal* pGlobalPointer );
 
@@ -214,6 +221,9 @@ private:
 	// 破棄等のイベントを実際に実行
 	void ExecuteEvents();
 public:
+
+	// HACK This is bad code.
+	float EffectDistance = 0;
 
 	// コンストラクタ
 	ManagerImplemented( int instance_max, bool autoFlip );
@@ -603,6 +613,8 @@ public:
 		@brief	現在存在するエフェクトのハンドルからカリングの空間を配置しなおす。
 	*/
 	void RessignCulling() override;
+
+	void SetCameraMatrix(const Matrix44& cameraMat) override;
 
 	virtual int GetRef() { return ReferenceObject::GetRef(); }
 	virtual int AddRef() { return ReferenceObject::AddRef(); }

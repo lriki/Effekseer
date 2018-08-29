@@ -85,7 +85,17 @@ namespace Effekseer.Data
 			private set;
 		}
 
-        public DepthValues()
+		[Name(language = Language.Japanese, value = "LOD")]
+		[Description(language = Language.Japanese, value = "LOD")]
+		[Name(language = Language.English, value = "LOD")]
+		[Description(language = Language.English, value = "LOD")]
+		public Value.Float LOD
+		{
+			get;
+			private set;
+		}
+
+		public DepthValues()
         {
             DepthOffset = new Value.Float();
 			IsScaleChangedDependingOnDepthOffset = new Value.Boolean();
@@ -93,6 +103,7 @@ namespace Effekseer.Data
 			ZSort = new Value.Enum<ZSortType>(ZSortType.None);
 			DrawingPriority = new Value.Int(0, 255, -255);
 			SoftParticle = new Value.Float(0, float.MaxValue, 0.0f);
+			LOD = new Value.Float(100000.0f, float.MaxValue, 0, 1);
         }
     }
 }

@@ -148,6 +148,7 @@ struct ParameterDepthValues
 	ZSortType	ZSort;
 	int32_t	DrawingPriority;
 	float	SoftParticle;
+	float	LOD = FLT_MAX;
 
 	ParameterDepthValues()
 	{

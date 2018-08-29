@@ -546,6 +546,8 @@ public:
 		@brief	現在存在するエフェクトのハンドルからカリングの空間を配置しなおす。
 	*/
 	virtual void RessignCulling() = 0;
+
+	virtual void SetCameraMatrix(const Matrix44& cameraMat) = 0;
 };
 //----------------------------------------------------------------------------------
 //
