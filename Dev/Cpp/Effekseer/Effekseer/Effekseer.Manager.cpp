@@ -1894,6 +1894,12 @@ void ManagerImplemented::SetCameraMatrix(const Matrix44& cameraMat)
 
 }
 
+void ManagerImplemented::SetCameraParameter(const ::Effekseer::Vector3D& front, const ::Effekseer::Vector3D& position)
+{
+	cameraFrontDirection = front;
+	cameraLocalPos = position;
+}
+
 //----------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------

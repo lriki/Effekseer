@@ -548,6 +548,8 @@ public:
 	virtual void RessignCulling() = 0;
 
 	virtual void SetCameraMatrix(const Matrix44& cameraMat) = 0;
+
+	virtual void SetCameraParameter(const ::Effekseer::Vector3D& front, const ::Effekseer::Vector3D& position) = 0;
 };
 //----------------------------------------------------------------------------------
 //

@@ -9,7 +9,7 @@ namespace Effekseer.Binary
 {
 	public class Exporter
 	{
-		const int Version = 13;
+		const int Version = 14;
 
 		/// <summary>
 		/// エフェクトデータの出力

@@ -616,6 +616,8 @@ public:
 
 	void SetCameraMatrix(const Matrix44& cameraMat) override;
 
+	void SetCameraParameter(const ::Effekseer::Vector3D& front, const ::Effekseer::Vector3D& position) override;
+
 	virtual int GetRef() { return ReferenceObject::GetRef(); }
 	virtual int AddRef() { return ReferenceObject::AddRef(); }
 	virtual int Release() { return ReferenceObject::Release(); }
