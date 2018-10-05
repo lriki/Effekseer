@@ -1,0 +1,258 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="EffekseerRenderer">
+      <UniqueIdentifier>{43ddea41-d59a-46da-8052-75fafb38ca6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EffekseerRendererCommon">
+      <UniqueIdentifier>{78d0391b-4390-43ef-b616-5dde6c474cd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EffekseerRendererLLGI">
+      <UniqueIdentifier>{cdb45416-b697-41e2-9b5f-ec2ae41b20ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EffekseerRendererLLGI\LLGI">
+      <UniqueIdentifier>{e1a23e92-a0ca-40c2-9b65-e8f267ef8dd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EffekseerRendererLLGI\LLGI\G3">
+      <UniqueIdentifier>{e5d8b319-8f01-470f-b6a9-5a702bf12cdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EffekseerRendererLLGI\LLGI\G3\PC">
+      <UniqueIdentifier>{60719022-ce70-47e3-911b-f4a5439678c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EffekseerRendererLLGI\LLGI\G3\DX12">
+      <UniqueIdentifier>{041875ef-01d7-4b87-ba2b-5e4a57d66b5f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\EffekseerRendererCommon\EffekseerRenderer.IndexBufferBase.h">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererCommon\EffekseerRenderer.VertexBufferBase.h">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererCommon\EffekseerRenderer.RibbonRendererBase.h">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererCommon\EffekseerRenderer.TrackRendererBase.h">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererCommon\EffekseerRenderer.RenderStateBase.h">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererCommon\EffekseerRenderer.ModelRendererBase.h">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererCommon\EffekseerRenderer.SpriteRendererBase.h">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererCommon\EffekseerRenderer.RingRendererBase.h">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererCommon\EffekseerRenderer.Renderer.h">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererCommon\EffekseerRenderer.DXTK.dds.h">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererCommon\EffekseerRenderer.DXTK.DDSTextureLoader.h">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererCommon\EffekseerRenderer.PngTextureLoader.h">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererCommon\EffekseerRenderer.StandardRenderer.h">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.Base.h">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.Base.Pre.h">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.DeviceObject.h">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.IndexBuffer.h">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.ModelLoader.h">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.ModelRenderer.h">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.Renderer.h">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.RendererImplemented.h">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.RenderState.h">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.Shader.h">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.TextureLoader.h">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.VertexBuffer.h">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\LLGI.Base.h">
+      <Filter>EffekseerRendererLLGI\LLGI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.CommandList.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.Compiler.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.ConstantBuffer.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.Graphics.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.IndexBuffer.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.PipelineState.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.Platform.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.Shader.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.Texture.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.VertexBuffer.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\DX12\LLGI.G3.BaseDX12.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\DX12\LLGI.G3.CommandListDX12.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\DX12\LLGI.G3.CompilerDX12.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\DX12\LLGI.G3.GraphicsDX12.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EffekseerRendererLLGI\LLGI\G3\DX12\LLGI.G3.PlatformDX12.h">
+      <Filter>EffekseerRendererLLGI\LLGI\G3\DX12</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\EffekseerRendererCommon\EffekseerRenderer.VertexBufferBase.cpp">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererCommon\EffekseerRenderer.IndexBufferBase.cpp">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererCommon\EffekseerRenderer.RibbonRendererBase.cpp">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererCommon\EffekseerRenderer.TrackRendererBase.cpp">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererCommon\EffekseerRenderer.RenderStateBase.cpp">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererCommon\EffekseerRenderer.ModelRendererBase.cpp">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererCommon\EffekseerRenderer.SpriteRendererBase.cpp">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererCommon\EffekseerRenderer.RingRendererBase.cpp">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererCommon\EffekseerRenderer.Renderer.cpp">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererCommon\EffekseerRenderer.DXTK.DDSTextureLoader.cpp">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererCommon\EffekseerRenderer.PngTextureLoader.cpp">
+      <Filter>EffekseerRendererCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.DeviceObject.cpp">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.IndexBuffer.cpp">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.ModelLoader.cpp">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.ModelRenderer.cpp">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.Renderer.cpp">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.RenderState.cpp">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.Shader.cpp">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.TextureLoader.cpp">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\EffekseerRendererLLGI.VertexBuffer.cpp">
+      <Filter>EffekseerRendererLLGI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.CommandList.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.Compiler.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.ConstantBuffer.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.Graphics.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.IndexBuffer.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.PipelineState.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.Platform.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.Shader.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.Texture.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\LLGI.G3.VertexBuffer.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\DX12\LLGI.G3.CommandListDX12.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\DX12\LLGI.G3.CompilerDX12.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\DX12\LLGI.G3.GraphicsDX12.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\DX12\LLGI.G3.PlatformDX12.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EffekseerRendererLLGI\LLGI\G3\PC\LLGI.G3.CreatePC.cpp">
+      <Filter>EffekseerRendererLLGI\LLGI\G3\PC</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
