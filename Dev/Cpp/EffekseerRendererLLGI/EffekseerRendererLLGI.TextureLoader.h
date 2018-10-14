@@ -3,11 +3,10 @@
 #ifndef	__EFFEKSEERRENDERER_LLGI_TEXTURELOADER_H__
 #define	__EFFEKSEERRENDERER_LLGI_TEXTURELOADER_H__
 
-//----------------------------------------------------------------------------------
-// Include
-//----------------------------------------------------------------------------------
 #include "EffekseerRendererLLGI.RendererImplemented.h"
 #include "EffekseerRendererLLGI.DeviceObject.h"
+#include "LLGI/G3/LLGI.G3.Graphics.h"
+#include "LLGI/G3/LLGI.G3.Texture.h"
 
 //-----------------------------------------------------------------------------------
 //
@@ -21,13 +20,13 @@ class TextureLoader
 	: public ::Effekseer::TextureLoader
 {
 private:
-	ID3D11Device*						device;
-	ID3D11DeviceContext*				context = nullptr;
+	LLGI::G3::Graphics* graphics = nullptr;
+
 	::Effekseer::FileInterface*			m_fileInterface;
 	::Effekseer::DefaultFileInterface	m_defaultFileInterface;
 
 public:
-	TextureLoader(ID3D11Device* device, ID3D11DeviceContext* context, ::Effekseer::FileInterface* fileInterface = NULL );
+	TextureLoader(LLGI::G3::Graphics* graphics, ::Effekseer::FileInterface* fileInterface = NULL );
 	virtual ~TextureLoader();
 
 public:

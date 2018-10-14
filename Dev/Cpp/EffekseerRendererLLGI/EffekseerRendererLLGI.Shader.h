@@ -2,32 +2,24 @@
 #ifndef	__EFFEKSEERRENDERER_LLGI_SHADER_H__
 #define	__EFFEKSEERRENDERER_LLGI_SHADER_H__
 
-//----------------------------------------------------------------------------------
-// Include
-//----------------------------------------------------------------------------------
 #include "EffekseerRendererLLGI.RendererImplemented.h"
 #include "EffekseerRendererLLGI.DeviceObject.h"
-#include "../../EffekseerRendererCommon/EffekseerRenderer.ShaderBase.h"
+#include "../EffekseerRendererCommon/EffekseerRenderer.ShaderBase.h"
 
-//-----------------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------------
+#include "LLGI/G3/LLGI.G3.Graphics.h"
+#include "LLGI/G3/LLGI.G3.Shader.h"
+
 namespace EffekseerRendererLLGI
 {
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
+
 class Shader
 	: public DeviceObject
 	, public ::EffekseerRenderer::ShaderBase
 {
 private:
 	
-	ID3D11VertexShader*			m_vertexShader;
-	ID3D11PixelShader*			m_pixelShader;
-	ID3D11InputLayout*			m_vertexDeclaration;
-	ID3D11Buffer*			m_constantBufferToVS;
-	ID3D11Buffer*			m_constantBufferToPS;
+	LLGI::G3::Shader* shader_ = nullptr;
+	std::vector<LLGI::VertexLayoutFormat> layoutFormats;
 
 	void*					m_vertexConstantBuffer;
 	void*					m_pixelConstantBuffer;
@@ -37,9 +29,9 @@ private:
 
 	Shader(
 		RendererImplemented* renderer,
-		ID3D11VertexShader* vertexShader,
-		ID3D11PixelShader* pixelShader,
-		ID3D11InputLayout* vertexDeclaration );
+		LLGI::G3::Shader* shader,
+		const std::vector<LLGI::VertexLayoutFormat>& layoutFormats);
+
 public:
 	virtual ~Shader();
 
@@ -50,18 +42,11 @@ public:
 		const uint8_t pixelShader[], 
 		int32_t pixelShaderSize,
 		const char* name, 
-		const D3D11_INPUT_ELEMENT_DESC decl[],
-		int32_t layoutCount );
-
-public:	// デバイス復旧用
-	virtual void OnLostDevice();
-	virtual void OnResetDevice();
+		const std::vector<LLGI::VertexLayoutFormat>& layoutFormats);
 
 public:
-	ID3D11VertexShader* GetVertexShader() const { return m_vertexShader; }
-	ID3D11PixelShader* GetPixelShader() const { return m_pixelShader; }
-	ID3D11InputLayout* GetLayoutInterface() const { return m_vertexDeclaration; }
-
+	LLGI::G3::Shader* GetShader() const { return shader_; }
+	
 	void SetVertexConstantBufferSize(int32_t size);
 	void SetPixelConstantBufferSize(int32_t size);
 
@@ -73,11 +58,7 @@ public:
 
 	void SetConstantBuffer();
 };
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
+
 }
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
+
 #endif	// __EFFEKSEERRENDERER_LLGI_SHADER_H__

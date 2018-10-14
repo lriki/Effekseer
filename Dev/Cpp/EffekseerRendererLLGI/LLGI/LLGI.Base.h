@@ -19,6 +19,7 @@ namespace LLGI
 enum class DeviceType
 {
 	Default,
+	DirectX12,
 };
 
 enum class ErrorCode
@@ -70,6 +71,12 @@ enum class VertexLayoutFormat
 	R8G8B8A8_UNORM,
 	R8G8B8A8_UINT,
 	R32G32_FLOAT,
+};
+
+enum class TopologyType
+{
+	Triangle,
+	Line,
 };
 
 struct Vec2I

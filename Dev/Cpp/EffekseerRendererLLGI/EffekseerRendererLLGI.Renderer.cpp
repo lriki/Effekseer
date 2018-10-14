@@ -1,7 +1,5 @@
 ﻿
-//----------------------------------------------------------------------------------
-// Include
-//----------------------------------------------------------------------------------
+
 #include "EffekseerRendererLLGI.Renderer.h"
 #include "EffekseerRendererLLGI.RendererImplemented.h"
 #include "EffekseerRendererLLGI.RenderState.h"
@@ -18,239 +16,74 @@
 #include "EffekseerRendererLLGI.TextureLoader.h"
 #include "EffekseerRendererLLGI.ModelLoader.h"
 
-#include "../../EffekseerRendererCommon/EffekseerRenderer.SpriteRendererBase.h"
-#include "../../EffekseerRendererCommon/EffekseerRenderer.RibbonRendererBase.h"
-#include "../../EffekseerRendererCommon/EffekseerRenderer.RingRendererBase.h"
-#include "../../EffekseerRendererCommon/EffekseerRenderer.TrackRendererBase.h"
+#include "../EffekseerRendererCommon/EffekseerRenderer.SpriteRendererBase.h"
+#include "../EffekseerRendererCommon/EffekseerRenderer.RibbonRendererBase.h"
+#include "../EffekseerRendererCommon/EffekseerRenderer.RingRendererBase.h"
+#include "../EffekseerRendererCommon/EffekseerRenderer.TrackRendererBase.h"
 
-#ifdef __EFFEKSEER_RENDERER_INTERNAL_LOADER__
-#include "../../EffekseerRendererCommon/EffekseerRenderer.PngTextureLoader.h"
-#endif
-
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 namespace EffekseerRendererLLGI
 {
 
-namespace Standard_VS
-{
-	static
-#include "Shader/EffekseerRenderer.Standard_VS.h"
-}
-
-//-----------------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------------
-namespace Standard_PS
-{
-	static
-#include "Shader/EffekseerRenderer.Standard_PS.h"
-}
-
-//-----------------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------------
-namespace StandardNoTexture_PS
-{
-	static
-#include "Shader/EffekseerRenderer.StandardNoTexture_PS.h"
-}
-
-//-----------------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------------
-namespace Standard_Distortion_VS
-{
-	static
-#include "Shader/EffekseerRenderer.Standard_Distortion_VS.h"
-}
-
-//-----------------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------------
-namespace Standard_Distortion_PS
-{
-	static
-#include "Shader/EffekseerRenderer.Standard_Distortion_PS.h"
-}
-
-//-----------------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------------
-namespace StandardNoTexture_Distortion_PS
-{
-	static
-#include "Shader/EffekseerRenderer.StandardNoTexture_Distortion_PS.h"
-}
-
-//-----------------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------------
-::Effekseer::TextureLoader* CreateTextureLoader(ID3D11Device* device, ID3D11DeviceContext* context, ::Effekseer::FileInterface* fileInterface)
+::Effekseer::TextureLoader* CreateTextureLoader(LLGI::G3::Graphics* graphics, ::Effekseer::FileInterface* fileInterface)
 {
 #ifdef __EFFEKSEER_RENDERER_INTERNAL_LOADER__
-	return new TextureLoader(device, context, fileInterface);
+	return new TextureLoader(graphics, fileInterface);
 #else
 	return NULL;
 #endif
 }
 
-::Effekseer::ModelLoader* CreateModelLoader(ID3D11Device* device, ::Effekseer::FileInterface* fileInterface)
+::Effekseer::ModelLoader* CreateModelLoader(LLGI::G3::Graphics* graphics, ::Effekseer::FileInterface* fileInterface)
 {
 #ifdef __EFFEKSEER_RENDERER_INTERNAL_LOADER__
-	return new ModelLoader(device, fileInterface);
+	return new ModelLoader(graphics, fileInterface);
 #else
 	return NULL;
 #endif
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
-OriginalState::OriginalState()
-	: m_blendState		( NULL )
-	, m_depthStencilState	( NULL )
-	, m_depthStencilStateRef	( 0 )
-	, m_vertexConstantBuffer	( NULL )
-	, m_pixelConstantBuffer		( NULL )
-	, m_layout					( NULL )
-
-	, m_pRasterizerState(nullptr)
-	, m_pVS(nullptr)
-	, m_pPS(nullptr)
-	, m_pVB(nullptr)
-	, m_pIB(nullptr)
-
+bool PiplineStateKey::operator < (const PiplineStateKey &lhs, const PiplineStateKey &rhs)
 {
-	for( int32_t i = 0; i < 4; i++ )
+	if (lhs.shader != rhs.shader) return lhs.shader < rhs.shader;
+	if (lhs.state.AlphaBlend != rhs.state.AlphaBlend) return lhs.state.AlphaBlend < rhs.state.AlphaBlend;
+	if (lhs.state.CullingType != rhs.state.CullingType) return lhs.state.CullingType < rhs.state.CullingType;
+	if (lhs.state.DepthTest != rhs.state.DepthTest) return rhs.state.DepthTest;
+	if (lhs.state.DepthWrite != rhs.state.DepthWrite) return rhs.state.DepthWrite;
+
+	for (int i = 0; i < 4; i++)
 	{
-		m_samplers[i] = NULL;
+		if (lhs.state.TextureFilterTypes[i] != rhs.state.TextureFilterTypes[i]) return lhs.state.TextureFilterTypes[i] < rhs.state.TextureFilterTypes[i];
+		if (lhs.state.TextureWrapTypes[i] != rhs.state.TextureWrapTypes[i]) return lhs.state.TextureWrapTypes[i] < rhs.state.TextureWrapTypes[i];
 	}
 
-	for (int32_t i = 0; i < 4; i++)
-	{
-		m_psSRVs[i] = nullptr;
-	}
+	return false;
 }
 
 //----------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------
-OriginalState::~OriginalState()
-{
-	ReleaseState();
-}
-
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
-void OriginalState::SaveState(ID3D11Device* device, ID3D11DeviceContext* context )
-{
-	context->PSGetSamplers( 0, 4, m_samplers );
-	context->OMGetBlendState( &m_blendState, m_blendFactor, &m_blendSampleMask );
-	context->OMGetDepthStencilState( &m_depthStencilState, &m_depthStencilStateRef );
-	context->RSGetState(&m_pRasterizerState);
-
-	context->VSGetConstantBuffers(0, 1, &m_vertexConstantBuffer);
-	context->PSGetConstantBuffers(0, 1, &m_pixelConstantBuffer);
-
-	context->VSGetShader(&m_pVS, nullptr, nullptr);
-	context->PSGetShader(&m_pPS, nullptr, nullptr);
-
-	context->IAGetInputLayout( &m_layout );
-
-	context->IAGetPrimitiveTopology(&m_topology);
-
-	context->PSGetShaderResources(0, 4, m_psSRVs);
-
-	context->IAGetVertexBuffers(0, 1, &m_pVB, &m_vbStrides, &m_vbOffset);
-	context->IAGetIndexBuffer(&m_pIB, &m_ibFormat, &m_ibOffset);
-}
-
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
-void OriginalState::LoadState(ID3D11Device* device, ID3D11DeviceContext* context )
-{
-	context->PSSetSamplers(0, 4, m_samplers );
-	context->OMSetBlendState( m_blendState, m_blendFactor, m_blendSampleMask );
-	context->OMSetDepthStencilState( m_depthStencilState, m_depthStencilStateRef );
-	context->RSSetState(m_pRasterizerState);
-
-	context->VSSetConstantBuffers(0, 1, &m_vertexConstantBuffer);
-	context->PSSetConstantBuffers(0, 1, &m_pixelConstantBuffer);
-
-	context->VSSetShader(m_pVS, NULL, 0);
-	context->PSSetShader(m_pPS, NULL, 0);
-
-	context->IASetInputLayout( m_layout );
-
-	context->IASetPrimitiveTopology(m_topology);
-
-	context->PSSetShaderResources(0, 4, m_psSRVs);
-
-	context->IASetVertexBuffers(0, 1, &m_pVB, &m_vbStrides, &m_vbOffset);
-	context->IASetIndexBuffer(m_pIB, m_ibFormat, m_ibOffset);
-}
-
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
-void OriginalState::ReleaseState()
-{	
-	for( int32_t i = 0; i < 4; i++ )
-	{
-		ES_SAFE_RELEASE( m_samplers[i] );
-	}
-	ES_SAFE_RELEASE( m_blendState );
-
-	ES_SAFE_RELEASE( m_depthStencilState );
-
-	ES_SAFE_RELEASE(m_pRasterizerState);
-
-	ES_SAFE_RELEASE( m_vertexConstantBuffer );
-	ES_SAFE_RELEASE( m_pixelConstantBuffer );
-
-	ES_SAFE_RELEASE(m_pVS);
-	ES_SAFE_RELEASE(m_pPS);
-
-	ES_SAFE_RELEASE( m_layout );
-
-	for (int32_t i = 0; i < 4; i++)
-	{
-		ES_SAFE_RELEASE(m_psSRVs[i]);
-	}
-
-	ES_SAFE_RELEASE(m_pVB);
-	ES_SAFE_RELEASE(m_pIB);
-}
-
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
-Renderer* Renderer::Create(ID3D11Device* device, ID3D11DeviceContext* context, int32_t squareMaxCount, D3D11_COMPARISON_FUNC depthFunc)
+Renderer* Renderer::Create(LLGI::G3::Graphics* graphics, int32_t squareMaxCount)
 {
 	RendererImplemented* renderer = new RendererImplemented( squareMaxCount );
-	if( renderer->Initialize( device, context, depthFunc) )
+	if( renderer->Initialize( graphics) )
 	{
 		return renderer;
 	}
 	return NULL;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
+LLGI::G3::CommandList* RendererImplemented::GetCurrentCommandList()
+{
+	return nullptr;
+}
+
 RendererImplemented::RendererImplemented( int32_t squareMaxCount )
-	: m_device	( NULL )
-	, m_context	( NULL )
+	: graphics_( nullptr )
 	, m_vertexBuffer( NULL )
 	, m_indexBuffer	( NULL )
 	, m_squareMaxCount	( squareMaxCount )
 	, m_coordinateSystem	( ::Effekseer::CoordinateSystem::RH )
 	, m_renderState		( NULL )
-	, m_restorationOfStates( true )
 
 	, m_shader(nullptr)
 	, m_shader_no_texture(nullptr)
@@ -267,12 +100,6 @@ RendererImplemented::RendererImplemented( int32_t squareMaxCount )
 	SetLightAmbientColor( lightAmbient );
 
 	m_background.UserPtr = nullptr;
-
-	m_state = new OriginalState();
-
-#ifdef __EFFEKSEER_RENDERER_INTERNAL_LOADER__
-	EffekseerRenderer::PngTextureLoader::Initialize();
-#endif
 }
 
 //----------------------------------------------------------------------------------
@@ -280,15 +107,12 @@ RendererImplemented::RendererImplemented( int32_t squareMaxCount )
 //----------------------------------------------------------------------------------
 RendererImplemented::~RendererImplemented()
 {
-#ifdef __EFFEKSEER_RENDERER_INTERNAL_LOADER__
-	EffekseerRenderer::PngTextureLoader::Finalize();
-#endif
 
 	assert(GetRef() == 0);
 
 	ES_SAFE_DELETE(m_distortingCallback);
 
-	auto p = (ID3D11ShaderResourceView*)m_background.UserPtr;
+	auto p = (LLGI::G3::Texture*)m_background.UserPtr;
 	ES_SAFE_RELEASE(p);
 
 	ES_SAFE_DELETE(m_standardRenderer);
@@ -298,8 +122,6 @@ RendererImplemented::~RendererImplemented()
 	ES_SAFE_DELETE(m_shader_distortion);
 	ES_SAFE_DELETE(m_shader_no_texture_distortion);
 
-	ES_SAFE_DELETE( m_state );
-
 	ES_SAFE_DELETE( m_renderState );
 	ES_SAFE_DELETE( m_vertexBuffer );
 	ES_SAFE_DELETE( m_indexBuffer );
@@ -308,37 +130,17 @@ RendererImplemented::~RendererImplemented()
 	assert(GetRef() == -7);
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 void RendererImplemented::OnLostDevice()
 {
-	for (auto& device : m_deviceObjects)
-	{
-		device->OnLostDevice();
-	}
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 void RendererImplemented::OnResetDevice()
 {
-	for (auto& device : m_deviceObjects)
-	{
-		device->OnResetDevice();
-	}
 }
 
-
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
-bool RendererImplemented::Initialize(ID3D11Device* device, ID3D11DeviceContext* context, D3D11_COMPARISON_FUNC depthFunc)
+bool RendererImplemented::Initialize(LLGI::G3::Graphics* graphics)
 {
-	m_device = device;
-	m_context = context;
-	m_depthFunc = depthFunc;
+	graphics_ = graphics;
 
 	// 頂点の生成
 	{
@@ -401,25 +203,24 @@ bool RendererImplemented::Initialize(ID3D11Device* device, ID3D11DeviceContext* 
 	// 参照カウントの調整
 	Release();
 
-	m_renderState = new RenderState(this, m_depthFunc);
+	m_renderState = new RenderState(this);
 
 
 	// シェーダー
 	// 座標(3) 色(1) UV(2)
-	D3D11_INPUT_ELEMENT_DESC decl [] = {
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "NORMAL", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, sizeof(float) * 3, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, sizeof(float) * 4, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
+	std::vector<LLGI::VertexLayoutFormat> layouts;
+	layouts.push_back(LLGI::VertexLayoutFormat::R32G32B32_FLOAT);
+	layouts.push_back(LLGI::VertexLayoutFormat::R8G8B8A8_UNORM);
+	layouts.push_back(LLGI::VertexLayoutFormat::R32G32_FLOAT);
 
-	D3D11_INPUT_ELEMENT_DESC decl_distortion [] = {
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, sizeof(float) * 3, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, sizeof(float) * 4, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 1, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(float) * 6, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 2, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(float) * 9, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
+	std::vector<LLGI::VertexLayoutFormat> layouts_distort;
+	layouts.push_back(LLGI::VertexLayoutFormat::R32G32B32_FLOAT);
+	layouts.push_back(LLGI::VertexLayoutFormat::R8G8B8A8_UNORM);
+	layouts.push_back(LLGI::VertexLayoutFormat::R32G32_FLOAT);
+	layouts.push_back(LLGI::VertexLayoutFormat::R32G32B32_FLOAT);
+	layouts.push_back(LLGI::VertexLayoutFormat::R32G32B32_FLOAT);
 
+	
 	m_shader = Shader::Create(
 		this,
 		Standard_VS::g_VS,
@@ -514,7 +315,6 @@ void RendererImplemented::Destroy()
 //----------------------------------------------------------------------------------
 void RendererImplemented::SetRestorationOfStatesFlag(bool flag)
 {
-	m_restorationOfStates = flag;
 }
 
 //----------------------------------------------------------------------------------
@@ -522,16 +322,10 @@ void RendererImplemented::SetRestorationOfStatesFlag(bool flag)
 //----------------------------------------------------------------------------------
 bool RendererImplemented::BeginRendering()
 {
-	assert( m_device != NULL );
+	assert( graphics_ != NULL );
 
 	::Effekseer::Matrix44::Mul( m_cameraProj, m_camera, m_proj );
 	
-	// ステートを保存する
-	if( m_restorationOfStates )
-	{
-		m_state->SaveState( m_device, m_context );
-	}
-
 	// ステート初期設定
 	m_renderState->GetActiveState().Reset();
 	m_renderState->Update( true );
@@ -542,53 +336,21 @@ bool RendererImplemented::BeginRendering()
 	return true;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 bool RendererImplemented::EndRendering()
 {
-	assert( m_device != NULL );
+	assert( graphics_ != NULL );
 	
 	// レンダラーリセット
 	m_standardRenderer->ResetAndRenderingIfRequired();
 
-	// ステートを復元する
-	if( m_restorationOfStates )
-	{
-		m_state->LoadState( m_device, m_context );
-		m_state->ReleaseState();
-	}
-
 	return true;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
-ID3D11Device* RendererImplemented::GetDevice()
-{
-	return m_device;
-}
-
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
-ID3D11DeviceContext* RendererImplemented::GetContext()
-{
-	return m_context;
-}
-
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 VertexBuffer* RendererImplemented::GetVertexBuffer()
 {
 	return m_vertexBuffer;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 IndexBuffer* RendererImplemented::GetIndexBuffer()
 {
 	if (m_renderMode == ::Effekseer::RenderMode::Wireframe)
@@ -601,65 +363,41 @@ IndexBuffer* RendererImplemented::GetIndexBuffer()
 	}
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 int32_t RendererImplemented::GetSquareMaxCount() const
 {
 	return m_squareMaxCount;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 ::EffekseerRenderer::RenderStateBase* RendererImplemented::GetRenderState()
 {
 	return m_renderState;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 const ::Effekseer::Vector3D& RendererImplemented::GetLightDirection() const
 {
 	return m_lightDirection;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 void RendererImplemented::SetLightDirection( const ::Effekseer::Vector3D& direction )
 {
 	m_lightDirection = direction;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 const ::Effekseer::Color& RendererImplemented::GetLightColor() const
 {
 	return m_lightColor;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 void RendererImplemented::SetLightColor( const ::Effekseer::Color& color )
 {
 	m_lightColor = color;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 const ::Effekseer::Color& RendererImplemented::GetLightAmbientColor() const
 {
 	return m_lightAmbient;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 void RendererImplemented::SetLightAmbientColor( const ::Effekseer::Color& color )
 {
 	m_lightAmbient = color;
@@ -776,7 +514,7 @@ void RendererImplemented::SetCameraParameter(const ::Effekseer::Vector3D& front,
 ::Effekseer::TextureLoader* RendererImplemented::CreateTextureLoader( ::Effekseer::FileInterface* fileInterface )
 {
 #ifdef __EFFEKSEER_RENDERER_INTERNAL_LOADER__
-	return new TextureLoader(this->GetDevice(), this->GetContext(), fileInterface );
+	return new TextureLoader(this->GetGraphics(), fileInterface );
 #else
 	return NULL;
 #endif
@@ -788,7 +526,7 @@ void RendererImplemented::SetCameraParameter(const ::Effekseer::Vector3D& front,
 ::Effekseer::ModelLoader* RendererImplemented::CreateModelLoader( ::Effekseer::FileInterface* fileInterface )
 {
 #ifdef __EFFEKSEER_RENDERER_INTERNAL_LOADER__
-	return new ModelLoader(this->GetDevice(), fileInterface );
+	return new ModelLoader(this->GetGraphics(), fileInterface );
 #else
 	return NULL;
 #endif
@@ -800,11 +538,11 @@ Effekseer::TextureData* RendererImplemented::GetBackground()
 	return &m_background;
 }
 
-void RendererImplemented::SetBackground(ID3D11ShaderResourceView* background)
+void RendererImplemented::SetBackground(LLGI::G3::Texture* background)
 {
 	ES_SAFE_ADDREF(background);
 
-	auto p = (ID3D11ShaderResourceView*)m_background.UserPtr;
+	auto p = (LLGI::G3::Texture*)m_background.UserPtr;
 	ES_SAFE_RELEASE(p);
 	m_background.UserPtr = background;
 }
@@ -820,15 +558,9 @@ void RendererImplemented::SetDistortingCallback(EffekseerRenderer::DistortingCal
 	m_distortingCallback = callback;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
-void RendererImplemented::SetVertexBuffer(ID3D11Buffer* vertexBuffer, int32_t size)
+void RendererImplemented::SetVertexBuffer(LLGI::G3::VertexBuffer* vertexBuffer, int32_t size)
 {
-	ID3D11Buffer* vBuf = vertexBuffer;
-	uint32_t vertexSize = size;
-	uint32_t offset = 0;
-	GetContext()->IASetVertexBuffers( 0, 1, &vBuf, &vertexSize, &offset ); 
+	currentVertexBuffer = vertexBuffer;
 }
 
 //----------------------------------------------------------------------------------
@@ -836,10 +568,7 @@ void RendererImplemented::SetVertexBuffer(ID3D11Buffer* vertexBuffer, int32_t si
 //----------------------------------------------------------------------------------
 void RendererImplemented::SetVertexBuffer( VertexBuffer* vertexBuffer, int32_t size )
 {
-	ID3D11Buffer* vBuf = vertexBuffer->GetInterface();
-	uint32_t vertexSize = size;
-	uint32_t offset = 0;
-	GetContext()->IASetVertexBuffers( 0, 1, &vBuf, &vertexSize, &offset ); 
+	currentVertexBuffer = vertexBuffer->GetVertexBuffer();
 }
 
 //----------------------------------------------------------------------------------
@@ -847,15 +576,15 @@ void RendererImplemented::SetVertexBuffer( VertexBuffer* vertexBuffer, int32_t s
 //----------------------------------------------------------------------------------
 void RendererImplemented::SetIndexBuffer( IndexBuffer* indexBuffer )
 {
-	GetContext()->IASetIndexBuffer( indexBuffer->GetInterface(), DXGI_FORMAT_R16_UINT, 0);
+	GetCurrentCommandList()->SetIndexBuffer(indexBuffer->GetIndexBuffer());
 }
 
 //----------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------
-void RendererImplemented::SetIndexBuffer(ID3D11Buffer* indexBuffer)
+void RendererImplemented::SetIndexBuffer(LLGI::G3::IndexBuffer* indexBuffer)
 {
-	GetContext()->IASetIndexBuffer( indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	GetCurrentCommandList()->SetIndexBuffer(indexBuffer);
 }
 
 //----------------------------------------------------------------------------------
@@ -865,14 +594,12 @@ void RendererImplemented::SetLayout( Shader* shader )
 {
 	if (m_renderMode == Effekseer::RenderMode::Normal)
 	{
-		GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		currentTopologyType = LLGI::TopologyType::Triangle;
 	}
 	else
 	{
-		GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		currentTopologyType = LLGI::TopologyType::Line;
 	}
-
-	GetContext()->IASetInputLayout( shader->GetLayoutInterface() );
 }
 
 //----------------------------------------------------------------------------------
@@ -969,19 +696,21 @@ void RendererImplemented::SetPixelBufferToShader(const void* data, int32_t size)
 //----------------------------------------------------------------------------------
 void RendererImplemented::SetTextures(Shader* shader, Effekseer::TextureData** textures, int32_t count)
 {
-	ID3D11ShaderResourceView* srv[3];
+	std::array<LLGI::G3::Texture*, 3> textures_;
+
 	for (int32_t i = 0; i < count; i++)
 	{
 		if (textures[i] == nullptr)
 		{
-			srv[i] = nullptr;
+			GetCurrentCommandList()->SetTexture(nullptr, i, LLGI::ShaderStageType::Pixel);
 		}
 		else
 		{
-			srv[i] = (ID3D11ShaderResourceView*)textures[i]->UserPtr;
+			GetCurrentCommandList()->SetTexture(textures_[i], i, LLGI::ShaderStageType::Pixel);
 		}
 	}
-	GetContext()->PSSetShaderResources(0, count, srv);
+
+
 }
 
 void RendererImplemented::ResetRenderState()

@@ -24,13 +24,30 @@ namespace EffekseerRendererLLGI
 /**
 @brief	テクスチャ読込クラスを生成する。
 */
-::Effekseer::TextureLoader* CreateTextureLoader(ID3D11Device* device, ID3D11DeviceContext* context, ::Effekseer::FileInterface* fileInterface = NULL);
+::Effekseer::TextureLoader* CreateTextureLoader(LLGI::G3::Graphics* graphics, ::Effekseer::FileInterface* fileInterface = NULL);
 
 /**
 @brief	モデル読込クラスを生成する。
 */
-::Effekseer::ModelLoader* CreateModelLoader(ID3D11Device* device, ::Effekseer::FileInterface* fileInterface = NULL);
+::Effekseer::ModelLoader* CreateModelLoader(LLGI::G3::Graphics* graphics, ::Effekseer::FileInterface* fileInterface = NULL);
 
+
+struct FixedShader
+{
+	LLGI::DataStructure StandardTexture[2];
+	LLGI::DataStructure Standard[2];
+	LLGI::DataStructure StandardDistortedTexture[2];
+	LLGI::DataStructure StandardDistorted[2];
+
+	LLGI::DataStructure ModelShaderLightingTextureNormal[2];
+	LLGI::DataStructure ModelShaderLightingNormal[2];
+	LLGI::DataStructure ModelShaderLightingTexture[2];
+	LLGI::DataStructure ModelShaderLighting[2];
+	LLGI::DataStructure ModelShaderTexture[2];
+	LLGI::DataStructure ModelShader[2];
+	LLGI::DataStructure ModelShaderDistortionTexture[2];
+	LLGI::DataStructure ModelShaderDistortion[2];
+};
 
 /**
 	@brief	描画クラス
@@ -44,22 +61,10 @@ protected:
 
 public:
 	/**
-		@brief	インスタンスを生成する。
-		@param	device		DirectXのデバイス
-		@param	context		DirectXのコンテキスト
-		@param	squareMaxCount	最大描画スプライト数
-		@param	depthFunc	奥行きの計算方法
-		@return	インスタンス
 	*/
-	static Renderer* Create(
-		ID3D11Device* device, 
-		ID3D11DeviceContext* context, 
-		int32_t squareMaxCount, 
-		D3D11_COMPARISON_FUNC depthFunc = D3D11_COMPARISON_LESS);
+	static Renderer* Create(LLGI::G3::Graphics* graphics, int32_t squareMaxCount);
 
-	virtual ID3D11Device* GetDevice() = 0;
-
-	virtual ID3D11DeviceContext* GetContext() = 0;
+	virtual LLGI::G3::Graphics* GetGraphics() = 0;
 
 	/**
 		@brief	\~English	Get background
@@ -71,7 +76,7 @@ public:
 		@brief	\~English	Set background
 				\~Japanese	背景を設定する
 	*/
-	virtual void SetBackground(ID3D11ShaderResourceView* background) = 0;
+	virtual void SetBackground(LLGI::G3::Texture* background) = 0;
 };
 
 //----------------------------------------------------------------------------------

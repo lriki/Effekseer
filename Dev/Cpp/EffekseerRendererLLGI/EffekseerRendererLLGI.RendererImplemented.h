@@ -10,6 +10,7 @@
 #include "../EffekseerRendererCommon/EffekseerRenderer.RenderStateBase.h"
 #include "../EffekseerRendererCommon/EffekseerRenderer.StandardRenderer.h"
 #include "LLGI/G3/LLGI.G3.Graphics.h"
+#include "LLGI/G3/LLGI.G3.CommandList.h"
 
 #ifdef _MSC_VER
 #include <xmmintrin.h>
@@ -238,53 +239,14 @@ inline void TransformVertexes(VertexDistortion* vertexes, int32_t count, const :
 	}
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
-class OriginalState
+struct PiplineStateKey
 {
-private:
-	ID3D11SamplerState*	m_samplers[4];
+	Shader* shader = nullptr;
+	EffekseerRenderer::RenderStateBase::State state;
 
-	ID3D11BlendState*	m_blendState;
-	float				m_blendFactor[4];
-	UINT				m_blendSampleMask;
-
-	ID3D11DepthStencilState*	m_depthStencilState;
-	UINT						m_depthStencilStateRef;
-
-	ID3D11RasterizerState*		m_pRasterizerState;
-
-	ID3D11Buffer*				m_vertexConstantBuffer;
-	ID3D11Buffer*				m_pixelConstantBuffer;
-
-	ID3D11VertexShader*			m_pVS;
-	ID3D11PixelShader*			m_pPS;
-
-	ID3D11InputLayout*			m_layout;
-	D3D11_PRIMITIVE_TOPOLOGY	m_topology;
-
-	ID3D11ShaderResourceView*	m_psSRVs[4];
-
-	ID3D11Buffer*				m_pVB;
-	UINT						m_vbStrides;
-	UINT						m_vbOffset;
-
-	ID3D11Buffer*				m_pIB;
-	DXGI_FORMAT					m_ibFormat;
-	UINT						m_ibOffset;
-
-public:
-	OriginalState();
-	~OriginalState();
-	void SaveState(ID3D11Device* device, ID3D11DeviceContext* context );
-	void LoadState(ID3D11Device* device, ID3D11DeviceContext* context );
-	void ReleaseState();
+	static bool operator < (const PiplineStateKey &lhs, const PiplineStateKey &rhs);
 };
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 /**
 	@brief	描画クラス
 	@note
@@ -297,9 +259,14 @@ class RendererImplemented
 friend class DeviceObject;
 
 private:
-	ID3D11Device*			m_device;
-	ID3D11DeviceContext*	m_context;
+	std::map<PiplineStateKey, LLGI::G3::PipelineState*> piplineStates;
+	std::array<LLGI::G3::CommandList*, 3> commandLists;
+	std::array<LLGI::G3::ConstantBuffer*, 3> constantBuffers;
 
+	LLGI::G3::VertexBuffer* currentVertexBuffer = nullptr;
+	LLGI::TopologyType currentTopologyType = LLGI::TopologyType::Triangle;
+
+	LLGI::G3::Graphics* graphics_;
 	VertexBuffer*		m_vertexBuffer;
 	IndexBuffer*		m_indexBuffer;
 	IndexBuffer*		m_indexBufferForWireframe = nullptr;
@@ -338,16 +305,11 @@ private:
 
 	std::set<DeviceObject*>	m_deviceObjects;
 
-	// ステート
-	OriginalState*	m_state;
-
-	bool	m_restorationOfStates;
-
-	D3D11_COMPARISON_FUNC	m_depthFunc;
-
 	EffekseerRenderer::DistortingCallback* m_distortingCallback;
 
 	Effekseer::RenderMode m_renderMode = Effekseer::RenderMode::Normal;
+
+	LLGI::G3::CommandList* GetCurrentCommandList();
 
 public:
 	/**
@@ -366,7 +328,7 @@ public:
 	/**
 		@brief	初期化
 	*/
-	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* context, D3D11_COMPARISON_FUNC depthFunc);
+	bool Initialize(LLGI::G3::Graphics* graphics);
 
 	void Destroy();
 
@@ -383,16 +345,6 @@ public:
 	bool EndRendering();
 
 	LLGI::G3::Graphics* GetGraphics() { return nullptr; }
-
-	/**
-		@brief	デバイス取得
-	*/
-	ID3D11Device* GetDevice() override;
-
-	/**
-		@brief	コンテキスト取得
-	*/
-	ID3D11DeviceContext* GetContext() override;
 
 	/**
 		@brief	頂点バッファ取得
@@ -515,7 +467,7 @@ public:
 	/**
 		@brief	背景を設定する。
 	*/
-	void SetBackground(ID3D11ShaderResourceView* background) override;
+	void SetBackground(LLGI::G3::Texture* background) override;
 
 	EffekseerRenderer::DistortingCallback* GetDistortingCallback() override;
 
@@ -524,9 +476,9 @@ public:
 	EffekseerRenderer::StandardRenderer<RendererImplemented, Shader, Vertex, VertexDistortion>* GetStandardRenderer() { return m_standardRenderer; }
 
 	void SetVertexBuffer( VertexBuffer* vertexBuffer, int32_t size );
-	void SetVertexBuffer(ID3D11Buffer* vertexBuffer, int32_t size);
+	void SetVertexBuffer(LLGI::G3::VertexBuffer* vertexBuffer, int32_t size);
 	void SetIndexBuffer( IndexBuffer* indexBuffer );
-	void SetIndexBuffer(ID3D11Buffer* indexBuffer);
+	void SetIndexBuffer(LLGI::G3::IndexBuffer* indexBuffer);
 
 	void SetLayout( Shader* shader );
 	void DrawSprites( int32_t spriteCount, int32_t vertexOffset );
