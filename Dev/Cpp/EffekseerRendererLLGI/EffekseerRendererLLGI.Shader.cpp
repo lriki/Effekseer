@@ -7,10 +7,12 @@ namespace EffekseerRendererLLGI
 
 Shader::Shader(
 		RendererImplemented* renderer,
-		LLGI::G3::Shader* shader,
+	LLGI::G3::Shader* vertexShader,
+	LLGI::G3::Shader* pixelShader,
 		const std::vector<LLGI::VertexLayoutFormat>& layoutFormats)
 	: DeviceObject			( renderer )
-	, shader_				( shader )
+	, vertexShader_			( vertexShader )
+	, pixelShader_			(pixelShader)
 	, layoutFormats			(layoutFormats)
 	, m_vertexConstantBuffer(NULL)
 	, m_pixelConstantBuffer(NULL)
@@ -21,32 +23,28 @@ Shader::Shader(
 
 Shader::~Shader()
 {
-	ES_SAFE_RELEASE( shader_ );
+	ES_SAFE_RELEASE( vertexShader_ );
+	ES_SAFE_RELEASE(pixelShader_);
 	ES_SAFE_DELETE_ARRAY(m_vertexConstantBuffer);
 	ES_SAFE_DELETE_ARRAY(m_pixelConstantBuffer);
 }
 
 Shader* Shader::Create(
 	RendererImplemented* renderer,
-	const uint8_t vertexShader[],
-	int32_t vertexShaderSize,
-	const uint8_t pixelShader[],
-	int32_t pixelShaderSize,
+	LLGI::DataStructure* vertexData,
+	int32_t vertexDataCount,
+	LLGI::DataStructure* pixelData,
+	int32_t pixelDataCount,
 	const char* name,
 	const std::vector<LLGI::VertexLayoutFormat>& layoutFormats)
 {
 	assert( renderer != NULL );
 	assert( renderer->GetGraphics() != NULL );
 
-	LLGI::DataStructure shaderData[2];
-	shaderData[0].Data = (void*)vertexShader;
-	shaderData[0].Size = vertexShaderSize;
-	shaderData[1].Data = (void*)pixelShader;
-	shaderData[1].Size = pixelShaderSize;
+	auto vertexShader = renderer->GetGraphics()->CreateShader(vertexData, vertexDataCount);
+	auto pixelShader = renderer->GetGraphics()->CreateShader(pixelData, pixelDataCount);
 
-	auto shader = renderer->GetGraphics()->CreateShader(shaderData, 2);
-
-	return new Shader( renderer, shader, layoutFormats);
+	return new Shader( renderer, vertexShader, pixelShader, layoutFormats);
 }
 
 void Shader::SetVertexConstantBufferSize(int32_t size)

@@ -71,14 +71,7 @@ ModelRenderer::~ModelRenderer()
 }
 
 ModelRenderer* ModelRenderer::Create(RendererImplemented* renderer,
-	LLGI::DataStructure shader_buf_lighting_texture_normal[2],
-	LLGI::DataStructure shader_buf_lighting_normal[2],
-	LLGI::DataStructure shader_buf_lighting_texture[2],
-	LLGI::DataStructure shader_buf_lighting[2],
-	LLGI::DataStructure shader_buf_texture[2],
-	LLGI::DataStructure shader_buf[2],
-	LLGI::DataStructure shader_buf_distortion_texture[2],
-	LLGI::DataStructure shader_buf_distortion[2])
+	FixedShader* fixedShader)
 {
 
 	assert( renderer != NULL );
@@ -95,74 +88,74 @@ ModelRenderer* ModelRenderer::Create(RendererImplemented* renderer,
 
 	Shader* shader_lighting_texture_normal = Shader::Create( 
 		renderer, 
-		(const uint8_t*)shader_buf_lighting_texture_normal[0].Data,
-		shader_buf_lighting_texture_normal[0].Size,
-		(const uint8_t*)shader_buf_lighting_texture_normal[1].Data,
-		shader_buf_lighting_texture_normal[1].Size,
+		fixedShader->ModelShaderLightingTextureNormal_VS.data(),
+		fixedShader->ModelShaderLightingTextureNormal_VS.size(),
+		fixedShader->ModelShaderLightingTextureNormal_PS.data(),
+		fixedShader->ModelShaderLightingTextureNormal_PS.size(),
 		"ModelRendererLightingTextureNormal", 
 		layouts);
 
 	Shader* shader_lighting_normal = Shader::Create( 
 		renderer, 
-		(const uint8_t*)shader_buf_lighting_normal[0].Data,
-		shader_buf_lighting_normal[0].Size,
-		(const uint8_t*)shader_buf_lighting_normal[1].Data,
-		shader_buf_lighting_normal[1].Size,
+		fixedShader->ModelShaderLightingNormal_VS.data(),
+		fixedShader->ModelShaderLightingNormal_VS.size(),
+		fixedShader->ModelShaderLightingNormal_PS.data(),
+		fixedShader->ModelShaderLightingNormal_PS.size(),
 		"ModelRendererLightingNormal", 
 		layouts);
 
 
 	Shader* shader_lighting_texture = Shader::Create( 
 		renderer, 
-		(const uint8_t*)shader_buf_lighting_texture[0].Data,
-		shader_buf_lighting_texture[0].Size,
-		(const uint8_t*)shader_buf_lighting_texture[1].Data,
-		shader_buf_lighting_texture[1].Size,
+		fixedShader->ModelShaderLightingTexture_VS.data(),
+		fixedShader->ModelShaderLightingTexture_VS.size(),
+		fixedShader->ModelShaderLightingTexture_PS.data(),
+		fixedShader->ModelShaderLightingTexture_PS.size(),
 		"ModelRendererLightingTexture", 
 		layouts);
 
 	Shader* shader_lighting = Shader::Create( 
 		renderer, 
-		(const uint8_t*)shader_buf_lighting[0].Data,
-		shader_buf_lighting[0].Size,
-		(const uint8_t*)shader_buf_lighting[1].Data,
-		shader_buf_lighting[1].Size,
+		fixedShader->ModelShaderLighting_VS.data(),
+		fixedShader->ModelShaderLighting_VS.size(),
+		fixedShader->ModelShaderLighting_PS.data(),
+		fixedShader->ModelShaderLighting_PS.size(),
 		"ModelRendererLighting", 
 		layouts);
 
 	Shader* shader_texture = Shader::Create( 
 		renderer, 
-		(const uint8_t*)shader_buf_texture[0].Data,
-		shader_buf_texture[0].Size,
-		(const uint8_t*)shader_buf_texture[1].Data,
-		shader_buf_texture[1].Size,
+		fixedShader->ModelShaderTexture_VS.data(),
+		fixedShader->ModelShaderTexture_VS.size(),
+		fixedShader->ModelShaderTexture_PS.data(),
+		fixedShader->ModelShaderTexture_PS.size(),
 		"ModelRendererTexture", 
 		layouts);
 
 	Shader* shader = Shader::Create( 
 		renderer, 
-		(const uint8_t*)shader_buf[0].Data,
-		shader_buf[0].Size,
-		(const uint8_t*)shader_buf[1].Data,
-		shader_buf[1].Size,
+		fixedShader->ModelShader_VS.data(),
+		fixedShader->ModelShader_VS.size(),
+		fixedShader->ModelShader_PS.data(),
+		fixedShader->ModelShader_PS.size(),
 		"ModelRenderer", 
 		layouts);
 
 	auto shader_distortion_texture = Shader::Create(
 		renderer,
-		(const uint8_t*)shader_buf_distortion_texture[0].Data,
-		shader_buf_distortion_texture[0].Size,
-		(const uint8_t*)shader_buf_distortion_texture[1].Data,
-		shader_buf_distortion_texture[1].Size,
+		fixedShader->ModelShaderDistortionTexture_VS.data(),
+		fixedShader->ModelShaderDistortionTexture_VS.size(),
+		fixedShader->ModelShaderDistortionTexture_PS.data(),
+		fixedShader->ModelShaderDistortionTexture_PS.size(),
 		"ModelRendererDistortionTexture",
 		layouts);
 
 	auto shader_distortion = Shader::Create(
 		renderer,
-		(const uint8_t*)shader_buf_distortion[0].Data,
-		shader_buf_distortion[0].Size,
-		(const uint8_t*)shader_buf_distortion[1].Data,
-		shader_buf_distortion[1].Size,
+		fixedShader->ModelShaderDistortion_VS.data(),
+		fixedShader->ModelShaderDistortion_VS.size(),
+		fixedShader->ModelShaderDistortion_PS.data(),
+		fixedShader->ModelShaderDistortion_PS.size(),
 		"ModelRendererDistortion",
 		layouts);
 

@@ -18,7 +18,8 @@ class Shader
 {
 private:
 	
-	LLGI::G3::Shader* shader_ = nullptr;
+	LLGI::G3::Shader* vertexShader_ = nullptr;
+	LLGI::G3::Shader* pixelShader_ = nullptr;
 	std::vector<LLGI::VertexLayoutFormat> layoutFormats;
 
 	void*					m_vertexConstantBuffer;
@@ -29,7 +30,8 @@ private:
 
 	Shader(
 		RendererImplemented* renderer,
-		LLGI::G3::Shader* shader,
+		LLGI::G3::Shader* vertexShader,
+		LLGI::G3::Shader* pixelShader,
 		const std::vector<LLGI::VertexLayoutFormat>& layoutFormats);
 
 public:
@@ -37,16 +39,17 @@ public:
 
 	static Shader* Create( 
 		RendererImplemented* renderer, 
-		const uint8_t vertexShader[], 
-		int32_t vertexShaderSize,
-		const uint8_t pixelShader[], 
-		int32_t pixelShaderSize,
-		const char* name, 
+		LLGI::DataStructure* vertexData,
+		int32_t vertexDataCount,
+		LLGI::DataStructure* pixelData,
+		int32_t pixelDataCount,
+		const char* name,
 		const std::vector<LLGI::VertexLayoutFormat>& layoutFormats);
 
 public:
-	LLGI::G3::Shader* GetShader() const { return shader_; }
-	
+	LLGI::G3::Shader* GetVertexShader() const { return vertexShader_; }
+	LLGI::G3::Shader* GetPixelShader() const { return pixelShader_; }
+	std::vector<LLGI::VertexLayoutFormat>& GetVertexLayoutFormat() { return layoutFormats; }
 	void SetVertexConstantBufferSize(int32_t size);
 	void SetPixelConstantBufferSize(int32_t size);
 

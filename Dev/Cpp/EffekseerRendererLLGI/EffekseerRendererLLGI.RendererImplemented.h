@@ -11,10 +11,17 @@
 #include "../EffekseerRendererCommon/EffekseerRenderer.StandardRenderer.h"
 #include "LLGI/G3/LLGI.G3.Graphics.h"
 #include "LLGI/G3/LLGI.G3.CommandList.h"
+#include "LLGI/G3/LLGI.G3.Texture.h"
+#include "LLGI/G3/LLGI.G3.PipelineState.h"
 
-#ifdef _MSC_VER
-#include <xmmintrin.h>
+#if (defined(_M_IX86_FP) && _M_IX86_FP >= 2) || defined(__SSE__)
+#define EFK_SSE2
+#include <emmintrin.h>
+#elif defined(__ARM_NEON__)
+#define EFK_NEON
+#include <arm_neon.h>
 #endif
+
 
 //----------------------------------------------------------------------------------
 //
@@ -62,7 +69,7 @@ struct VertexDistortion
 //----------------------------------------------------------------------------------
 inline void TransformVertexes( Vertex* vertexes, int32_t count, const ::Effekseer::Matrix43& mat )
 {
-	#if 1
+	#if 0
 		__m128 r0 = _mm_loadu_ps( mat.Value[0] );
 		__m128 r1 = _mm_loadu_ps( mat.Value[1] );
 		__m128 r2 = _mm_loadu_ps( mat.Value[2] );
@@ -141,7 +148,7 @@ inline void TransformVertexes( Vertex* vertexes, int32_t count, const ::Effeksee
 //----------------------------------------------------------------------------------
 inline void TransformVertexes(VertexDistortion* vertexes, int32_t count, const ::Effekseer::Matrix43& mat)
 {
-#if 1
+#if 0
 	__m128 r0 = _mm_loadu_ps(mat.Value[0]);
 	__m128 r1 = _mm_loadu_ps(mat.Value[1]);
 	__m128 r2 = _mm_loadu_ps(mat.Value[2]);
@@ -239,12 +246,13 @@ inline void TransformVertexes(VertexDistortion* vertexes, int32_t count, const :
 	}
 }
 
-struct PiplineStateKey
+class PiplineStateKey
 {
+public:
 	Shader* shader = nullptr;
 	EffekseerRenderer::RenderStateBase::State state;
-
-	static bool operator < (const PiplineStateKey &lhs, const PiplineStateKey &rhs);
+	LLGI::TopologyType topologyType;
+	bool operator < (const PiplineStateKey &v) const;
 };
 
 /**
@@ -259,12 +267,25 @@ class RendererImplemented
 friend class DeviceObject;
 
 private:
+	static const int32_t ConstantBufferSize = 2048;
+	static const int32_t SwapBufferCount = 3;
+
 	std::map<PiplineStateKey, LLGI::G3::PipelineState*> piplineStates;
-	std::array<LLGI::G3::CommandList*, 3> commandLists;
-	std::array<LLGI::G3::ConstantBuffer*, 3> constantBuffers;
+	std::array<LLGI::G3::CommandList*, SwapBufferCount> commandLists;
+	std::array<std::vector<LLGI::G3::ConstantBuffer*>, SwapBufferCount> constantBuffers;
+	std::array<int32_t, SwapBufferCount> constantBufferOffsets;
+
+	int32_t currentSwapIndex = 0;
 
 	LLGI::G3::VertexBuffer* currentVertexBuffer = nullptr;
+	int32_t currentVertexBufferStride = 0;
 	LLGI::TopologyType currentTopologyType = LLGI::TopologyType::Triangle;
+
+	// TODO
+	/**
+		Create constants and copy
+		Shader
+	*/
 
 	LLGI::G3::Graphics* graphics_;
 	VertexBuffer*		m_vertexBuffer;
@@ -282,6 +303,8 @@ private:
 	Shader*							m_shader_no_texture_distortion;
 
 	Shader*		currentShader = nullptr;
+
+	FixedShader* fixedShader_ = nullptr;
 
 	EffekseerRenderer::StandardRenderer<RendererImplemented, Shader, Vertex, VertexDistortion>*	m_standardRenderer;
 
@@ -311,6 +334,10 @@ private:
 
 	LLGI::G3::CommandList* GetCurrentCommandList();
 
+	LLGI::G3::PipelineState* GetOrCreatePiplineState();
+
+	LLGI::G3::ConstantBuffer* GetOrCreateConstantBuffer();
+
 public:
 	/**
 		@brief	コンストラクタ
@@ -328,7 +355,7 @@ public:
 	/**
 		@brief	初期化
 	*/
-	bool Initialize(LLGI::G3::Graphics* graphics);
+	bool Initialize(LLGI::G3::Graphics* graphics, FixedShader* fixedShader);
 
 	void Destroy();
 

@@ -48,14 +48,7 @@ public:
 
 	static ModelRenderer* Create( 
 		RendererImplemented* renderer,
-		LLGI::DataStructure shader_lighting_texture_normal[2],
-		LLGI::DataStructure shader_lighting_normal[2],
-		LLGI::DataStructure shader_lighting_texture[2],
-		LLGI::DataStructure shader_lighting[2],
-		LLGI::DataStructure shader_texture[2],
-		LLGI::DataStructure shader[2],
-		LLGI::DataStructure shader_distortion_texture[2],
-		LLGI::DataStructure shader_distortion[2]);
+		FixedShader* fixedShader);
 
 public:
 	void BeginRendering(const efkModelNodeParam& parameter, int32_t count, void* userData);

@@ -11,6 +11,7 @@
 #include "LLGI/G3/LLGI.G3.Graphics.h"
 #include "LLGI/G3/LLGI.G3.VertexBuffer.h"
 #include "LLGI/G3/LLGI.G3.IndexBuffer.h"
+#include "LLGI/G3/LLGI.G3.Constantbuffer.h"
 
 //----------------------------------------------------------------------------------
 //
@@ -34,19 +35,33 @@ namespace EffekseerRendererLLGI
 
 struct FixedShader
 {
-	LLGI::DataStructure StandardTexture[2];
-	LLGI::DataStructure Standard[2];
-	LLGI::DataStructure StandardDistortedTexture[2];
-	LLGI::DataStructure StandardDistorted[2];
-
-	LLGI::DataStructure ModelShaderLightingTextureNormal[2];
-	LLGI::DataStructure ModelShaderLightingNormal[2];
-	LLGI::DataStructure ModelShaderLightingTexture[2];
-	LLGI::DataStructure ModelShaderLighting[2];
-	LLGI::DataStructure ModelShaderTexture[2];
-	LLGI::DataStructure ModelShader[2];
-	LLGI::DataStructure ModelShaderDistortionTexture[2];
-	LLGI::DataStructure ModelShaderDistortion[2];
+	std::vector<LLGI::DataStructure> StandardTexture_VS;
+	std::vector<LLGI::DataStructure> Standard_VS;
+	std::vector<LLGI::DataStructure> StandardDistortedTexture_VS;
+	std::vector<LLGI::DataStructure> StandardDistorted_VS;
+								   
+	std::vector<LLGI::DataStructure> ModelShaderLightingTextureNormal_VS;
+	std::vector<LLGI::DataStructure> ModelShaderLightingNormal_VS;
+	std::vector<LLGI::DataStructure> ModelShaderLightingTexture_VS;
+	std::vector<LLGI::DataStructure> ModelShaderLighting_VS;
+	std::vector<LLGI::DataStructure> ModelShaderTexture_VS;
+	std::vector<LLGI::DataStructure> ModelShader_VS;
+	std::vector<LLGI::DataStructure> ModelShaderDistortionTexture_VS;
+	std::vector<LLGI::DataStructure> ModelShaderDistortion_VS;
+								   
+	std::vector<LLGI::DataStructure> StandardTexture_PS;
+	std::vector<LLGI::DataStructure> Standard_PS;
+	std::vector<LLGI::DataStructure> StandardDistortedTexture_PS;
+	std::vector<LLGI::DataStructure> StandardDistorted_PS;
+								   
+	std::vector<LLGI::DataStructure> ModelShaderLightingTextureNormal_PS;
+	std::vector<LLGI::DataStructure> ModelShaderLightingNormal_PS;
+	std::vector<LLGI::DataStructure> ModelShaderLightingTexture_PS;
+	std::vector<LLGI::DataStructure> ModelShaderLighting_PS;
+	std::vector<LLGI::DataStructure> ModelShaderTexture_PS;
+	std::vector<LLGI::DataStructure> ModelShader_PS;
+	std::vector<LLGI::DataStructure> ModelShaderDistortionTexture_PS;
+	std::vector<LLGI::DataStructure> ModelShaderDistortion_PS;
 };
 
 /**
@@ -61,8 +76,10 @@ protected:
 
 public:
 	/**
+		@brief Create renderer
+		@param	fixedShader	don't delete before deleting renderer
 	*/
-	static Renderer* Create(LLGI::G3::Graphics* graphics, int32_t squareMaxCount);
+	static Renderer* Create(LLGI::G3::Graphics* graphics, FixedShader* fixedShader, int32_t squareMaxCount);
 
 	virtual LLGI::G3::Graphics* GetGraphics() = 0;
 
