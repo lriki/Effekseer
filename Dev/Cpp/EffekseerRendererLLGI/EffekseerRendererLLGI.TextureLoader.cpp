@@ -44,13 +44,32 @@ Effekseer::TextureData* TextureLoader::Load(const EFK_CHAR* path, ::Effekseer::T
 		int height;
 		int bpp;
 
-		pixels = (uint8_t*)stbi_loadf_from_memory((stbi_uc const *)data_texture, size_texture, &width, &height, &bpp, 4);
+		pixels = (uint8_t*)stbi_load_from_memory((stbi_uc const *)data_texture, size_texture, &width, &height, &bpp, 0);
 
 		if (width > 0)
 		{
 			auto texture = graphics->CreateTexture(LLGI::Vec2I(width, height), false, false);
 			auto buf = texture->Lock();
-			memcpy(buf, pixels, width * height * 4);
+
+			if (bpp == 4)
+			{
+				memcpy(buf, pixels, width * height * 4);
+			}
+			else
+			{
+				for (int h = 0; h < height; h++)
+				{
+					for (int w = 0; w < width; w++)
+					{
+						((uint8_t*)buf)[(w + h * width) * 4 + 0] = pixels[(w + h * width) * 3 + 0];
+						((uint8_t*)buf)[(w + h * width) * 4 + 1] = pixels[(w + h * width) * 3 + 1];
+						((uint8_t*)buf)[(w + h * width) * 4 + 2] = pixels[(w + h * width) * 3 + 2];
+						((uint8_t*)buf)[(w + h * width) * 4 + 3] = 255;
+					}
+				}
+			}
+
+			texture->Unlock();
 
 			textureData = new Effekseer::TextureData();
 			textureData->UserPtr = texture;

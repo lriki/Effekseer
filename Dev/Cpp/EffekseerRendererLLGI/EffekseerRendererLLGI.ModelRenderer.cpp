@@ -40,19 +40,19 @@ ModelRenderer::ModelRenderer(
 	
 	for( int32_t i = 0; i < 6; i++ )
 	{
-		shaders[i]->SetVertexConstantBufferSize(sizeof(::EffekseerRenderer::ModelRendererVertexConstantBuffer<40>));
-		shaders[i]->SetVertexRegisterCount(sizeof(::EffekseerRenderer::ModelRendererVertexConstantBuffer<40>)/(sizeof(float)*4));
+		shaders[i]->SetVertexConstantBufferSize(sizeof(::EffekseerRenderer::ModelRendererVertexConstantBuffer<1>));
+		shaders[i]->SetVertexRegisterCount(sizeof(::EffekseerRenderer::ModelRendererVertexConstantBuffer<1>)/(sizeof(float)*4));
 		shaders[i]->SetPixelConstantBufferSize(sizeof(::EffekseerRenderer::ModelRendererPixelConstantBuffer));
 		shaders[i]->SetPixelRegisterCount(sizeof(::EffekseerRenderer::ModelRendererPixelConstantBuffer)/(sizeof(float)*4));
 	}
 
-	m_shader_distortion_texture->SetVertexConstantBufferSize(sizeof(::EffekseerRenderer::ModelRendererVertexConstantBuffer<40>));
-	m_shader_distortion_texture->SetVertexRegisterCount(sizeof(::EffekseerRenderer::ModelRendererVertexConstantBuffer<40>) / (sizeof(float) * 4));
+	m_shader_distortion_texture->SetVertexConstantBufferSize(sizeof(::EffekseerRenderer::ModelRendererVertexConstantBuffer<1>));
+	m_shader_distortion_texture->SetVertexRegisterCount(sizeof(::EffekseerRenderer::ModelRendererVertexConstantBuffer<1>) / (sizeof(float) * 4));
 	m_shader_distortion_texture->SetPixelConstantBufferSize(sizeof(float) * 4);
 	m_shader_distortion_texture->SetPixelRegisterCount(1);
 
-	m_shader_distortion->SetVertexConstantBufferSize(sizeof(::EffekseerRenderer::ModelRendererVertexConstantBuffer<40>));
-	m_shader_distortion->SetVertexRegisterCount(sizeof(::EffekseerRenderer::ModelRendererVertexConstantBuffer<40>) / (sizeof(float) * 4));
+	m_shader_distortion->SetVertexConstantBufferSize(sizeof(::EffekseerRenderer::ModelRendererVertexConstantBuffer<1>));
+	m_shader_distortion->SetVertexRegisterCount(sizeof(::EffekseerRenderer::ModelRendererVertexConstantBuffer<1>) / (sizeof(float) * 4));
 	m_shader_distortion->SetPixelConstantBufferSize(sizeof(float) * 4);
 	m_shader_distortion->SetPixelRegisterCount(1);
 }
@@ -84,7 +84,7 @@ ModelRenderer* ModelRenderer::Create(RendererImplemented* renderer,
 	layouts.push_back(LLGI::VertexLayoutFormat::R32G32B32_FLOAT);
 	layouts.push_back(LLGI::VertexLayoutFormat::R32G32_FLOAT);
 	layouts.push_back(LLGI::VertexLayoutFormat::R8G8B8A8_UNORM);
-	layouts.push_back(LLGI::VertexLayoutFormat::R8G8B8A8_UINT);
+	layouts.push_back(LLGI::VertexLayoutFormat::R8G8B8A8_UNORM);
 
 	Shader* shader_lighting_texture_normal = Shader::Create( 
 		renderer, 
@@ -212,8 +212,8 @@ void ModelRenderer::EndRendering( const efkModelNodeParam& parameter, void* user
 		RendererImplemented,
 		Shader,
 		Model,
-		true,
-		40>(
+		false,
+		1>(
 		m_renderer,
 		m_shader_lighting_texture_normal,
 		m_shader_lighting_normal,

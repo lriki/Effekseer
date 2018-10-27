@@ -267,7 +267,7 @@ class RendererImplemented
 friend class DeviceObject;
 
 private:
-	static const int32_t ConstantBufferSize = 2048;
+	static const int32_t ConstantBufferSize = 1024;
 	static const int32_t SwapBufferCount = 3;
 
 	std::map<PiplineStateKey, LLGI::G3::PipelineState*> piplineStates;
@@ -371,7 +371,7 @@ public:
 	*/
 	bool EndRendering();
 
-	LLGI::G3::Graphics* GetGraphics() { return nullptr; }
+	LLGI::G3::Graphics* GetGraphics() { return graphics_; }
 
 	/**
 		@brief	頂点バッファ取得

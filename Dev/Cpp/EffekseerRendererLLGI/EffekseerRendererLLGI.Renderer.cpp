@@ -108,9 +108,52 @@ LLGI::G3::PipelineState* RendererImplemented::GetOrCreatePiplineState()
 	piplineState->IsDepthWriteEnabled = key.state.DepthWrite;
 	piplineState->Culling = (LLGI::CullingMode)key.state.CullingType;
 
+	piplineState->IsBlendEnabled = true;
+	piplineState->BlendSrcFuncAlpha = LLGI::BlendFuncType::One;
+	piplineState->BlendDstFuncAlpha = LLGI::BlendFuncType::One;
+	piplineState->BlendEquationAlpha = LLGI::BlendEquationType::Max;
+
 	if (key.state.AlphaBlend == Effekseer::AlphaBlendType::Opacity)
 	{
+		piplineState->IsBlendEnabled = false;
+		piplineState->IsBlendEnabled = true;
+		piplineState->BlendDstFunc = LLGI::BlendFuncType::Zero;
+		piplineState->BlendSrcFunc = LLGI::BlendFuncType::One;
+		piplineState->BlendEquationRGB = LLGI::BlendEquationType::Add;
+	}
 
+	if (key.state.AlphaBlend == Effekseer::AlphaBlendType::Blend)
+	{
+		piplineState->BlendDstFunc = LLGI::BlendFuncType::OneMinusSrcAlpha;
+		piplineState->BlendSrcFunc = LLGI::BlendFuncType::SrcAlpha;
+		piplineState->BlendEquationRGB = LLGI::BlendEquationType::Add;
+	}
+
+	if (key.state.AlphaBlend == Effekseer::AlphaBlendType::Add)
+	{
+		piplineState->BlendDstFunc = LLGI::BlendFuncType::One;
+		piplineState->BlendSrcFunc = LLGI::BlendFuncType::SrcAlpha;
+		piplineState->BlendEquationRGB = LLGI::BlendEquationType::Add;
+	}
+
+	if (key.state.AlphaBlend == Effekseer::AlphaBlendType::Sub)
+	{
+		piplineState->BlendDstFunc = LLGI::BlendFuncType::One;
+		piplineState->BlendSrcFunc = LLGI::BlendFuncType::SrcAlpha;
+		piplineState->BlendEquationRGB = LLGI::BlendEquationType::ReverseSub;
+		piplineState->BlendSrcFuncAlpha = LLGI::BlendFuncType::Zero;
+		piplineState->BlendDstFuncAlpha = LLGI::BlendFuncType::One;
+		piplineState->BlendEquationAlpha = LLGI::BlendEquationType::Add;
+	}
+
+	if (key.state.AlphaBlend == Effekseer::AlphaBlendType::Mul)
+	{
+		piplineState->BlendDstFunc = LLGI::BlendFuncType::SrcColor;
+		piplineState->BlendSrcFunc = LLGI::BlendFuncType::Zero;
+		piplineState->BlendEquationRGB = LLGI::BlendEquationType::Add;
+		piplineState->BlendSrcFuncAlpha = LLGI::BlendFuncType::Zero;
+		piplineState->BlendDstFuncAlpha = LLGI::BlendFuncType::One;
+		piplineState->BlendEquationAlpha = LLGI::BlendEquationType::Add;
 	}
 
 	piplineState->Compile();
@@ -118,6 +161,18 @@ LLGI::G3::PipelineState* RendererImplemented::GetOrCreatePiplineState()
 	piplineStates[key] = piplineState;
 
 	return piplineState;
+}
+
+LLGI::G3::ConstantBuffer* RendererImplemented::GetOrCreateConstantBuffer()
+{
+	if (constantBuffers[currentSwapIndex].size() <= constantBufferOffsets[currentSwapIndex])
+	{
+		constantBuffers[currentSwapIndex].push_back(graphics_->CreateConstantBuffer(ConstantBufferSize));
+	}
+
+	auto ret = constantBuffers[currentSwapIndex][constantBufferOffsets[currentSwapIndex]];
+	constantBufferOffsets[currentSwapIndex]++;
+	return ret;
 }
 
 RendererImplemented::RendererImplemented( int32_t squareMaxCount )
@@ -188,6 +243,8 @@ RendererImplemented::~RendererImplemented()
 	ES_SAFE_DELETE( m_indexBuffer );
 	ES_SAFE_DELETE(m_indexBufferForWireframe);
 
+	LLGI::SafeRelease(graphics_);
+
 	assert(GetRef() == -7);
 }
 
@@ -203,6 +260,8 @@ bool RendererImplemented::Initialize(LLGI::G3::Graphics* graphics, FixedShader* 
 {
 	graphics_ = graphics;
 	fixedShader_ = fixedShader;
+
+	LLGI::SafeAddRef(graphics_);
 
 	// command lists
 	for (int32_t i = 0; i < SwapBufferCount; i++)
@@ -396,8 +455,13 @@ bool RendererImplemented::BeginRendering()
 	m_renderState->GetActiveState().Reset();
 	m_renderState->Update( true );
 
+	GetCurrentCommandList()->Begin();
+	//GetCurrentCommandList()->BeginRenderPass(nullptr);
+
 	// レンダラーリセット
 	m_standardRenderer->ResetAndRenderingIfRequired();
+
+	constantBufferOffsets[currentSwapIndex] = 0;
 
 	return true;
 }
@@ -408,6 +472,10 @@ bool RendererImplemented::EndRendering()
 	
 	// レンダラーリセット
 	m_standardRenderer->ResetAndRenderingIfRequired();
+
+	//GetCurrentCommandList()->EndRenderPass();
+	GetCurrentCommandList()->End();
+	graphics_->Execute(GetCurrentCommandList());
 
 	currentSwapIndex++;
 	currentSwapIndex %= SwapBufferCount;
@@ -678,6 +746,26 @@ void RendererImplemented::SetLayout( Shader* shader )
 //----------------------------------------------------------------------------------
 void RendererImplemented::DrawSprites( int32_t spriteCount, int32_t vertexOffset )
 {
+	// constant buffer
+	if (currentShader->GetVertexConstantBufferSize() > 0)
+	{
+		auto cb = GetOrCreateConstantBuffer();
+		assert(cb != nullptr);
+		memcpy(cb->Lock(), currentShader->GetVertexConstantBuffer(), currentShader->GetVertexConstantBufferSize());
+		cb->Unlock();
+		GetCurrentCommandList()->SetConstantBuffer(cb, LLGI::ShaderStageType::Vertex);
+	}
+	
+	if (currentShader->GetPixelConstantBufferSize() > 0)
+	{
+		auto cb = GetOrCreateConstantBuffer();
+		assert(cb != nullptr);
+		memcpy(cb->Lock(), currentShader->GetPixelConstantBuffer(), currentShader->GetPixelConstantBufferSize());
+		cb->Unlock();
+		GetCurrentCommandList()->SetConstantBuffer(cb, LLGI::ShaderStageType::Pixel);
+	}
+	
+
 	auto piplineState = GetOrCreatePiplineState();
 	GetCurrentCommandList()->SetPipelineState(piplineState);
 
@@ -686,12 +774,12 @@ void RendererImplemented::DrawSprites( int32_t spriteCount, int32_t vertexOffset
 
 	if (m_renderMode == Effekseer::RenderMode::Normal)
 	{
-		GetCurrentCommandList()->SetVertexBuffer(currentVertexBuffer, currentVertexBufferStride , vertexOffset);
+		GetCurrentCommandList()->SetVertexBuffer(currentVertexBuffer, currentVertexBufferStride , vertexOffset * currentVertexBufferStride);
 		GetCurrentCommandList()->Draw(spriteCount * 2);
 	}
 	else
 	{
-		GetCurrentCommandList()->SetVertexBuffer(currentVertexBuffer, currentVertexBufferStride, vertexOffset);
+		GetCurrentCommandList()->SetVertexBuffer(currentVertexBuffer, currentVertexBufferStride, vertexOffset * currentVertexBufferStride);
 		GetCurrentCommandList()->Draw(spriteCount * 4);
 	}
 }
@@ -701,6 +789,25 @@ void RendererImplemented::DrawSprites( int32_t spriteCount, int32_t vertexOffset
 //----------------------------------------------------------------------------------
 void RendererImplemented::DrawPolygon( int32_t vertexCount, int32_t indexCount)
 {
+	// constant buffer
+	if (currentShader->GetVertexConstantBufferSize() > 0)
+	{
+		auto cb = GetOrCreateConstantBuffer();
+		assert(cb != nullptr);
+		memcpy(cb->Lock(), currentShader->GetVertexConstantBuffer(), currentShader->GetVertexConstantBufferSize());
+		cb->Unlock();
+		GetCurrentCommandList()->SetConstantBuffer(cb, LLGI::ShaderStageType::Vertex);
+	}
+
+	if (currentShader->GetPixelConstantBufferSize() > 0)
+	{
+		auto cb = GetOrCreateConstantBuffer();
+		assert(cb != nullptr);
+		memcpy(cb->Lock(), currentShader->GetPixelConstantBuffer(), currentShader->GetPixelConstantBufferSize());
+		cb->Unlock();
+		GetCurrentCommandList()->SetConstantBuffer(cb, LLGI::ShaderStageType::Pixel);
+	}
+
 	auto piplineState = GetOrCreatePiplineState();
 	GetCurrentCommandList()->SetPipelineState(piplineState);
 
@@ -765,8 +872,6 @@ void RendererImplemented::SetPixelBufferToShader(const void* data, int32_t size)
 //----------------------------------------------------------------------------------
 void RendererImplemented::SetTextures(Shader* shader, Effekseer::TextureData** textures, int32_t count)
 {
-	std::array<LLGI::G3::Texture*, 3> textures_;
-
 	for (int32_t i = 0; i < count; i++)
 	{
 		if (textures[i] == nullptr)
@@ -775,7 +880,9 @@ void RendererImplemented::SetTextures(Shader* shader, Effekseer::TextureData** t
 		}
 		else
 		{
-			GetCurrentCommandList()->SetTexture(textures_[i], i, LLGI::ShaderStageType::Pixel);
+			auto t = (LLGI::G3::Texture*)(textures[i]->UserPtr);
+
+			GetCurrentCommandList()->SetTexture(t, i, LLGI::ShaderStageType::Pixel);
 		}
 	}
 }

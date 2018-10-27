@@ -24,6 +24,8 @@ private:
 
 	void*					m_vertexConstantBuffer;
 	void*					m_pixelConstantBuffer;
+	int32_t	vertexConstantBufferSize = 0;
+	int32_t	pixelConstantBufferSize = 0;
 
 	int32_t					m_vertexRegisterCount;
 	int32_t					m_pixelRegisterCount;
@@ -52,6 +54,8 @@ public:
 	std::vector<LLGI::VertexLayoutFormat>& GetVertexLayoutFormat() { return layoutFormats; }
 	void SetVertexConstantBufferSize(int32_t size);
 	void SetPixelConstantBufferSize(int32_t size);
+	int32_t GetVertexConstantBufferSize() { return vertexConstantBufferSize; }
+	int32_t GetPixelConstantBufferSize() { return pixelConstantBufferSize; }
 
 	void* GetVertexConstantBuffer() { return m_vertexConstantBuffer; }
 	void* GetPixelConstantBuffer() { return m_pixelConstantBuffer; }

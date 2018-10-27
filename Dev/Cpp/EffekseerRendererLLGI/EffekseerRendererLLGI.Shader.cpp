@@ -51,12 +51,14 @@ void Shader::SetVertexConstantBufferSize(int32_t size)
 {
 	ES_SAFE_DELETE_ARRAY(m_vertexConstantBuffer);
 	m_vertexConstantBuffer = new uint8_t[size];
+	vertexConstantBufferSize = size;
 }
 
 void Shader::SetPixelConstantBufferSize(int32_t size)
 {
 	ES_SAFE_DELETE_ARRAY(m_pixelConstantBuffer);
 	m_pixelConstantBuffer = new uint8_t[size];
+	pixelConstantBufferSize = size;
 }
 
 void Shader::SetConstantBuffer()
