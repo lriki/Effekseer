@@ -20,6 +20,7 @@ enum class DeviceType
 {
 	Default,
 	DirectX12,
+    Metal,
 };
 
 enum class ErrorCode
@@ -185,6 +186,17 @@ void SafeRelease(T& t)
 		t = NULL;
 	}
 }
+
+template <class T>
+void SafeDelete(T& t)
+{
+	if (t != NULL)
+	{
+		delete t;
+		t = NULL;
+	}
+}
+
 
 class ReferenceObject
 {
