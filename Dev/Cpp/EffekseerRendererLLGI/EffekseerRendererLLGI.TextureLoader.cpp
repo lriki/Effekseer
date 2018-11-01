@@ -55,6 +55,34 @@ Effekseer::TextureData* TextureLoader::Load(const EFK_CHAR* path, ::Effekseer::T
 			{
 				memcpy(buf, pixels, width * height * 4);
 			}
+			else if (bpp == 2)
+			{
+				// Gray+Alpha
+				for (int h = 0; h < height; h++)
+				{
+					for (int w = 0; w < width; w++)
+					{
+						((uint8_t*)buf)[(w + h * width) * 4 + 0] = pixels[(w + h * width) * 2 + 0];
+						((uint8_t*)buf)[(w + h * width) * 4 + 1] = pixels[(w + h * width) * 2 + 0];
+						((uint8_t*)buf)[(w + h * width) * 4 + 2] = pixels[(w + h * width) * 2 + 0];
+						((uint8_t*)buf)[(w + h * width) * 4 + 3] = pixels[(w + h * width) * 2 + 1];
+					}
+				}
+			}
+			else if (bpp == 1)
+			{
+				// Gray
+				for (int h = 0; h < height; h++)
+				{
+					for (int w = 0; w < width; w++)
+					{
+						((uint8_t*)buf)[(w + h * width) * 4 + 0] = pixels[(w + h * width) * 2 + 0];
+						((uint8_t*)buf)[(w + h * width) * 4 + 1] = pixels[(w + h * width) * 2 + 0];
+						((uint8_t*)buf)[(w + h * width) * 4 + 2] = pixels[(w + h * width) * 2 + 0];
+						((uint8_t*)buf)[(w + h * width) * 4 + 3] = 255;
+					}
+				}
+			}
 			else
 			{
 				for (int h = 0; h < height; h++)

@@ -79,7 +79,7 @@ public:
 		@brief Create renderer
 		@param	fixedShader	don't delete before deleting renderer
 	*/
-	static Renderer* Create(LLGI::G3::Graphics* graphics, FixedShader* fixedShader, int32_t squareMaxCount);
+	static Renderer* Create(LLGI::G3::Graphics* graphics, FixedShader* fixedShader, bool isReversedDepth, int32_t squareMaxCount);
 
 	virtual LLGI::G3::Graphics* GetGraphics() = 0;
 

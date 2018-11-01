@@ -306,6 +306,8 @@ private:
 
 	FixedShader* fixedShader_ = nullptr;
 
+	bool isReversedDepth_ = false;
+
 	EffekseerRenderer::StandardRenderer<RendererImplemented, Shader, Vertex, VertexDistortion>*	m_standardRenderer;
 
 	::Effekseer::Vector3D	m_lightDirection;
@@ -355,7 +357,7 @@ public:
 	/**
 		@brief	初期化
 	*/
-	bool Initialize(LLGI::G3::Graphics* graphics, FixedShader* fixedShader);
+	bool Initialize(LLGI::G3::Graphics* graphics, FixedShader* fixedShader, bool isReversedDepth);
 
 	void Destroy();
 

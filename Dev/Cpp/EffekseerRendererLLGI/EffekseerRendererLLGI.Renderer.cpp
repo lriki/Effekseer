@@ -64,10 +64,10 @@ bool PiplineStateKey::operator < (const PiplineStateKey &v) const
 //----------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------
-Renderer* Renderer::Create(LLGI::G3::Graphics* graphics, FixedShader* fixedShader, int32_t squareMaxCount)
+Renderer* Renderer::Create(LLGI::G3::Graphics* graphics, FixedShader* fixedShader, bool isReversedDepth, int32_t squareMaxCount)
 {
 	RendererImplemented* renderer = new RendererImplemented( squareMaxCount );
-	if( renderer->Initialize( graphics, fixedShader) )
+	if( renderer->Initialize( graphics, fixedShader, isReversedDepth) )
 	{
 		return renderer;
 	}
@@ -93,6 +93,16 @@ LLGI::G3::PipelineState* RendererImplemented::GetOrCreatePiplineState()
 	}
 
 	auto piplineState = graphics_->CreatePiplineState();
+
+	if (isReversedDepth_)
+	{
+		piplineState->DepthFunc = LLGI::DepthFuncType::Greater;
+	}
+	else
+	{
+		piplineState->DepthFunc = LLGI::DepthFuncType::Less;
+	}
+
 	piplineState->SetShader(LLGI::ShaderStageType::Vertex, currentShader->GetVertexShader());
 	piplineState->SetShader(LLGI::ShaderStageType::Pixel, currentShader->GetPixelShader());
 
@@ -256,10 +266,11 @@ void RendererImplemented::OnResetDevice()
 {
 }
 
-bool RendererImplemented::Initialize(LLGI::G3::Graphics* graphics, FixedShader* fixedShader)
+bool RendererImplemented::Initialize(LLGI::G3::Graphics* graphics, FixedShader* fixedShader, bool isReversedDepth)
 {
 	graphics_ = graphics;
 	fixedShader_ = fixedShader;
+	isReversedDepth_ = isReversedDepth;
 
 	LLGI::SafeAddRef(graphics_);
 
@@ -872,17 +883,34 @@ void RendererImplemented::SetPixelBufferToShader(const void* data, int32_t size)
 //----------------------------------------------------------------------------------
 void RendererImplemented::SetTextures(Shader* shader, Effekseer::TextureData** textures, int32_t count)
 {
+	auto state = GetRenderState()->GetActiveState();
+	LLGI::TextureWrapMode ws[2];
+	ws[(int)Effekseer::TextureWrapType::Clamp] = LLGI::TextureWrapMode::Clamp;
+	ws[(int)Effekseer::TextureWrapType::Repeat] = LLGI::TextureWrapMode::Repeat;
+
+	LLGI::TextureMinMagFilter fs[2];
+	fs[(int)Effekseer::TextureFilterType::Linear] = LLGI::TextureMinMagFilter::Linear;
+	fs[(int)Effekseer::TextureFilterType::Nearest] = LLGI::TextureMinMagFilter::Nearest;
+
 	for (int32_t i = 0; i < count; i++)
 	{
 		if (textures[i] == nullptr)
 		{
-			GetCurrentCommandList()->SetTexture(nullptr, i, LLGI::ShaderStageType::Pixel);
+			GetCurrentCommandList()->SetTexture(
+				nullptr, 
+				ws[(int)state.TextureWrapTypes[i]],
+				fs[(int)state.TextureFilterTypes[i]], 
+				i, LLGI::ShaderStageType::Pixel);
 		}
 		else
 		{
 			auto t = (LLGI::G3::Texture*)(textures[i]->UserPtr);
 
-			GetCurrentCommandList()->SetTexture(t, i, LLGI::ShaderStageType::Pixel);
+			GetCurrentCommandList()->SetTexture(
+				t,
+				ws[(int)state.TextureWrapTypes[i]],
+				fs[(int)state.TextureFilterTypes[i]],
+				i, LLGI::ShaderStageType::Pixel);
 		}
 	}
 }
