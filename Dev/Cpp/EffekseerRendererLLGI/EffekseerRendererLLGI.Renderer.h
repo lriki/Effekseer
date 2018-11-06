@@ -84,6 +84,12 @@ public:
 	virtual LLGI::G3::Graphics* GetGraphics() = 0;
 
 	/**
+		@brief	\~English	notify that new frame is started
+		\~Japanese	新規フレームが始ったことを通知する
+	*/
+	virtual void NewFrame() = 0;
+
+	/**
 		@brief	\~English	Get background
 				\~Japanese	背景を取得する
 	*/

@@ -267,16 +267,9 @@ class RendererImplemented
 friend class DeviceObject;
 
 private:
-	static const int32_t ConstantBufferSize = 1024;
-	static const int32_t SwapBufferCount = 3;
-
 	std::map<PiplineStateKey, LLGI::G3::PipelineState*> piplineStates;
-	std::array<LLGI::G3::CommandList*, SwapBufferCount> commandLists;
-	std::array<std::vector<LLGI::G3::ConstantBuffer*>, SwapBufferCount> constantBuffers;
-	std::array<int32_t, SwapBufferCount> constantBufferOffsets;
-
-	int32_t currentSwapIndex = 0;
-
+	LLGI::G3::CommandList* commandList = nullptr;
+	
 	LLGI::G3::VertexBuffer* currentVertexBuffer = nullptr;
 	int32_t currentVertexBufferStride = 0;
 	LLGI::TopologyType currentTopologyType = LLGI::TopologyType::Triangle;
@@ -338,8 +331,6 @@ private:
 
 	LLGI::G3::PipelineState* GetOrCreatePiplineState();
 
-	LLGI::G3::ConstantBuffer* GetOrCreateConstantBuffer();
-
 public:
 	/**
 		@brief	コンストラクタ
@@ -372,6 +363,8 @@ public:
 		@brief	描画終了
 	*/
 	bool EndRendering();
+
+	void NewFrame() override;
 
 	LLGI::G3::Graphics* GetGraphics() { return graphics_; }
 
