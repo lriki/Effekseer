@@ -203,6 +203,9 @@ RendererImplemented::RendererImplemented( int32_t squareMaxCount )
 //----------------------------------------------------------------------------------
 RendererImplemented::~RendererImplemented()
 {
+	// to prevent objects to be disposed before finish renderings.
+	graphics_->WaitFinish();
+
 	for (auto p : piplineStates)
 	{
 		p.second->Release();
