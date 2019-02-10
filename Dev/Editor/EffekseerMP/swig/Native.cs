@@ -132,8 +132,8 @@ public class Native : global::System.IDisposable {
     return ret;
   }
 
-  public bool Record(string path, int count, int xCount, int offsetFrame, int freq, TransparenceType transparenceType) {
-    bool ret = EffekseerNativePINVOKE.Native_Record__SWIG_1(swigCPtr, path, count, xCount, offsetFrame, freq, (int)transparenceType);
+  public bool Record(string pathWithoutExt, int count, int xCount, int offsetFrame, int freq, TransparenceType transparenceType) {
+    bool ret = EffekseerNativePINVOKE.Native_Record__SWIG_1(swigCPtr, pathWithoutExt, count, xCount, offsetFrame, freq, (int)transparenceType);
     return ret;
   }
 

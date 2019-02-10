@@ -244,6 +244,79 @@ struct HandleHolder
 	}
 };
 
+void GenerateExportedImageWithBlendAndAdd(std::vector<Effekseer::Color>& pixelsBlend, std::vector<Effekseer::Color>& pixelsAdd, std::vector<Effekseer::Color> pixels[9])
+{
+	auto f2b = [](float v) -> uint8_t
+	{
+		auto v_ = v * 255;
+		if (v_ > 255) v_ = 255;
+		if (v_ < 0) v_ = 0;
+		return v_;
+	};
+
+	auto b2f = [](uint8_t v) -> float
+	{
+		auto v_ = (float)v / 255.0f;
+		return v_;
+	};
+
+	pixelsAdd.resize(pixels[0].size());
+	pixelsBlend.resize(pixels[0].size());
+
+	for (auto i = 0; i < pixels[0].size(); i++)
+	{
+		float colors[4][9];
+		
+		for (auto j = 0; j < 9; j++)
+		{
+			colors[0][j] = pixels[j][i].R / 255.0;
+			colors[1][j] = pixels[j][i].G / 255.0;
+			colors[2][j] = pixels[j][i].B / 255.0;
+			colors[3][j] = pixels[j][i].A / 255.0;
+
+			colors[0][j] *= colors[3][j];
+			colors[1][j] *= colors[3][j];
+			colors[2][j] *= colors[3][j];
+		}
+
+		
+		std::array<float, 3> gradients;
+		gradients.fill(0.0f);
+
+		for (auto c = 0; c < 3; c++)
+		{
+			bool found = false;
+
+			for (auto j = 0; j < 9; j++)
+			{
+				if (colors[c][j] >= 1.0f)
+				{
+					gradients[c] = (colors[c][j] - colors[c][0]) / ((j + 1) / 9.0f);
+					found = true;
+					break;
+				}
+			}
+
+			if (!found)
+			{
+				gradients[c] = (colors[c][8] - colors[c][0]);
+			}
+		}
+
+		float blendAlpha = (3.0f - (gradients[0] + gradients[1] + gradients[2])) / 3.0f;
+
+		pixelsBlend[i].R = 0.0f;
+		pixelsBlend[i].G = 0.0f;
+		pixelsBlend[i].B = 0.0f;
+		pixelsBlend[i].A = Effekseer::Clamp(blendAlpha * 255.0f, 255.0f, 0.0f);
+
+		pixelsAdd[i].R = Effekseer::Clamp(colors[0][0] * 255.0f, 255.0f, 0.0f);
+		pixelsAdd[i].G = Effekseer::Clamp(colors[1][0] * 255.0f, 255.0f, 0.0f);
+		pixelsAdd[i].B = Effekseer::Clamp(colors[2][0] * 255.0f, 255.0f, 0.0f);
+		pixelsAdd[i].A = 255.0f;
+	}
+}
+
 //----------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------
@@ -1270,8 +1343,11 @@ bool Native::Record(const char16_t* path, int32_t count, int32_t xCount, int32_t
 	int32_t yCount = count / xCount;
 	if (count != xCount * yCount) yCount++;
 
-	std::vector<Effekseer::Color> pixels_out;
-	pixels_out.resize((g_renderer->GuideWidth * xCount) * (g_renderer->GuideHeight * yCount));
+	std::vector<Effekseer::Color> pixels_out_blend;
+	std::vector<Effekseer::Color> pixels_out_add;
+
+	pixels_out_blend.resize((g_renderer->GuideWidth * xCount) * (g_renderer->GuideHeight * yCount));
+	pixels_out_add.resize((g_renderer->GuideWidth * xCount) * (g_renderer->GuideHeight * yCount));
 
 	g_renderer->IsBackgroundTranslucent = transparenceType == TransparenceType::Original;
 
@@ -1301,6 +1377,12 @@ bool Native::Record(const char16_t* path, int32_t count, int32_t xCount, int32_t
 		g_manager->Update();
 	}
 
+	int pointNum = 1;
+	if (transparenceType == TransparenceType::GenerateAddAndAlpha)
+	{
+		pointNum = 9;
+	}
+
 	g_renderer->BeginRenderToView(g_lastViewWidth, g_lastViewHeight);
 
 	int32_t count_ = 0;
@@ -1308,29 +1390,38 @@ bool Native::Record(const char16_t* path, int32_t count, int32_t xCount, int32_t
 	{
 		for( int x = 0; x < xCount; x++ )
 		{
-			if (!g_renderer->BeginRecord(g_renderer->GuideWidth, g_renderer->GuideHeight)) goto Exit;
-
-			g_renderer->BeginRendering();
-
-			if (g_renderer->Distortion == EffekseerTool::eDistortionType::DistortionType_Current)
+			std::vector<Effekseer::Color> pixels[9];
+			for (int loop = 0; loop < pointNum; loop++)
 			{
-				g_manager->DrawBack();
+				auto colorValue = Effekseer::Clamp(32 * loop, 255, 0);
+				g_renderer->BackgroundColor = Effekseer::Color(colorValue, colorValue, colorValue, 255);
+				
+				if (!g_renderer->BeginRecord(g_renderer->GuideWidth, g_renderer->GuideHeight)) goto Exit;
 
-				// HACK
-				g_renderer->GetRenderer()->EndRendering();
+				g_renderer->BeginRendering();
 
-				g_renderer->CopyToBackground();
+				if (g_renderer->Distortion == EffekseerTool::eDistortionType::DistortionType_Current)
+				{
+					g_manager->DrawBack();
 
-				// HACK
-				g_renderer->GetRenderer()->BeginRendering();
-				g_manager->DrawFront();
+					// HACK
+					g_renderer->GetRenderer()->EndRendering();
+
+					g_renderer->CopyToBackground();
+
+					// HACK
+					g_renderer->GetRenderer()->BeginRendering();
+					g_manager->DrawFront();
+				}
+				else
+				{
+					g_manager->Draw();
+				}
+
+				g_renderer->EndRendering();
+				
+				g_renderer->EndRecord(pixels[loop], transparenceType == TransparenceType::Generate, transparenceType == TransparenceType::None);
 			}
-			else
-			{
-				g_manager->Draw();
-			}
-
-			g_renderer->EndRendering();
 
 			for (int j = 0; j < freq; j++)
 			{
@@ -1343,14 +1434,30 @@ bool Native::Record(const char16_t* path, int32_t count, int32_t xCount, int32_t
 				g_manager->StopEffect(handle);
 			}
 
-			std::vector<Effekseer::Color> pixels;
-			g_renderer->EndRecord(pixels, transparenceType == TransparenceType::Generate, transparenceType == TransparenceType::None);
-
-			for (int32_t y_ = 0; y_ < g_renderer->GuideHeight; y_++)
+			if (transparenceType == TransparenceType::GenerateAddAndAlpha)
 			{
-				for (int32_t x_ = 0; x_ < g_renderer->GuideWidth; x_++)
+				std::vector<Effekseer::Color> pixels_blend;
+				std::vector<Effekseer::Color> pixels_add;
+
+				GenerateExportedImageWithBlendAndAdd(pixels_blend, pixels_add, pixels);
+
+				for (int32_t y_ = 0; y_ < g_renderer->GuideHeight; y_++)
 				{
-					pixels_out[x * g_renderer->GuideWidth + x_ + (g_renderer->GuideWidth * xCount) * (g_renderer->GuideHeight * y + y_)] = pixels[x_ + y_ * g_renderer->GuideWidth];
+					for (int32_t x_ = 0; x_ < g_renderer->GuideWidth; x_++)
+					{
+						pixels_out_blend[x * g_renderer->GuideWidth + x_ + (g_renderer->GuideWidth * xCount) * (g_renderer->GuideHeight * y + y_)] = pixels_blend[x_ + y_ * g_renderer->GuideWidth];
+						pixels_out_add[x * g_renderer->GuideWidth + x_ + (g_renderer->GuideWidth * xCount) * (g_renderer->GuideHeight * y + y_)] = pixels_add[x_ + y_ * g_renderer->GuideWidth];
+					}
+				}
+			}
+			else
+			{
+				for (int32_t y_ = 0; y_ < g_renderer->GuideHeight; y_++)
+				{
+					for (int32_t x_ = 0; x_ < g_renderer->GuideWidth; x_++)
+					{
+						pixels_out_blend[x * g_renderer->GuideWidth + x_ + (g_renderer->GuideWidth * xCount) * (g_renderer->GuideHeight * y + y_)] = pixels[0][x_ + y_ * g_renderer->GuideWidth];
+					}
 				}
 			}
 		}
@@ -1358,9 +1465,26 @@ bool Native::Record(const char16_t* path, int32_t count, int32_t xCount, int32_t
 	
 Exit:;
 
-	efk::PNGHelper pngHelper;
-	pngHelper.Save((char16_t*)path, g_renderer->GuideWidth * xCount, g_renderer->GuideHeight * yCount, pixels_out.data());
+	if (transparenceType == TransparenceType::GenerateAddAndAlpha)
+	{
+		efk::PNGHelper pngHelper;
+		std::u16string path_blend = path;
+		std::u16string path_add = path;
+		path_blend += u".blend.png";
+		path_add += u".add.png";
 
+		pngHelper.Save(path_blend.c_str(), g_renderer->GuideWidth * xCount, g_renderer->GuideHeight * yCount, pixels_out_blend.data());
+		pngHelper.Save(path_add.c_str(), g_renderer->GuideWidth * xCount, g_renderer->GuideHeight * yCount, pixels_out_add.data());
+	}
+	else
+	{
+		efk::PNGHelper pngHelper;
+		std::u16string path_ = path;
+		path_ += u".png";
+
+		pngHelper.Save(path_.c_str(), g_renderer->GuideWidth * xCount, g_renderer->GuideHeight * yCount, pixels_out_blend.data());
+	}
+	
 	g_manager->Update();
 
 	g_renderer->EndRenderToView();

@@ -29,6 +29,7 @@ namespace Effekseer.GUI.Dock
 			"1",
 			"2",
 			"3",
+			"4",
 		};
 
 		public Recorder()
@@ -41,6 +42,7 @@ namespace Effekseer.GUI.Dock
 			selectedAlphaTypes[0] = Resources.GetString("None");
 			selectedAlphaTypes[1] = Resources.GetString("UseOriginalImage");
 			selectedAlphaTypes[2] = Resources.GetString("GenerateAlpha");
+			selectedAlphaTypes[3] = "生成(2枚)";
 
 			Label = Resources.GetString("Recorder") + "###Recorder";
 
@@ -303,6 +305,8 @@ namespace Effekseer.GUI.Dock
 						filename += "." + filter;
                     }
 
+					var filename_wo_ext = System.IO.Path.GetDirectoryName(filename) + System.IO.Path.DirectorySeparatorChar + System.IO.Path.GetFileNameWithoutExtension(filename);
+
 					var viewer = Manager.Viewer;
 					var param = Manager.Viewer.GetViewerParamater();
 
@@ -327,14 +331,14 @@ namespace Effekseer.GUI.Dock
 
 					if (selectedTypeIndex == 0)
 					{
-						if (!viewer.Record(filename, count, width, startingFrame, freq, (swig.TransparenceType)selectedAlphaIndex))
+						if (!viewer.Record(filename_wo_ext, count, width, startingFrame, freq, (swig.TransparenceType)selectedAlphaIndex))
 						{
                             swig.GUIManager.show(errorMessage, "Error", swig.DialogStyle.Error, swig.DialogButtons.OK);
 						}
 					}
 					else if (selectedTypeIndex == 1)
 					{
-						if (!viewer.Record(filename, count, startingFrame, freq, (swig.TransparenceType)selectedAlphaIndex))
+						if (!viewer.Record(filename_wo_ext, count, startingFrame, freq, (swig.TransparenceType)selectedAlphaIndex))
 						{
                             swig.GUIManager.show(errorMessage, "Error", swig.DialogStyle.Error, swig.DialogButtons.OK);
 						}

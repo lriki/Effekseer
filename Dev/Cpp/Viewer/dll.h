@@ -115,6 +115,7 @@ enum class TransparenceType
 	None = 0,
 	Original = 1,
 	Generate = 2,
+	GenerateAddAndAlpha = 3,
 };
 
 class Native
@@ -234,7 +235,7 @@ public:
 
 	bool Record(const char16_t* pathWithoutExt, const char16_t* ext, int32_t count, int32_t offsetFrame, int32_t freq, TransparenceType transparenceType);
 
-	bool Record(const char16_t* path, int32_t count, int32_t xCount, int32_t offsetFrame, int32_t freq, TransparenceType transparenceType);
+	bool Record(const char16_t* pathWithoutExt, int32_t count, int32_t xCount, int32_t offsetFrame, int32_t freq, TransparenceType transparenceType);
 
 	bool RecordAsGifAnimation(const char16_t* path, int32_t count, int32_t offsetFrame, int32_t freq, TransparenceType transparenceType);
 

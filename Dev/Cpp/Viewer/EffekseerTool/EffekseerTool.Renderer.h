@@ -227,14 +227,16 @@ public:
 	bool EndRenderToView();
 
 	/**
-		@brief	録画開始
+		@brief	Start recording
 	*/
 	bool BeginRecord( int32_t width, int32_t height );
 
 	/**
-	@brief	録画終了
+	@brief	End recording and export an image
 	*/
 	void EndRecord(std::vector<Effekseer::Color>& pixels, bool generateAlpha, bool removeAlpha);
+
+	void EndRecord(std::vector<Effekseer::Color>& pixels);
 
 	/**
 		@brief	背景の読み込み

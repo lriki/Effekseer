@@ -616,6 +616,15 @@ void Renderer::EndRecord(std::vector<Effekseer::Color>& pixels, bool generateAlp
 	m_recording = false;
 }
 
+void Renderer::EndRecord(std::vector<Effekseer::Color>& pixels)
+{
+	assert(m_recording);
+
+	graphics->EndRecord(pixels);
+
+	m_recording = false;
+}
+
 void Renderer::LoadBackgroundImage(const char16_t* path)
 {
 	if (backgroundPath == path) return;
