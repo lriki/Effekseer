@@ -22,7 +22,7 @@ namespace Effekseer.Data
 
 	public class GenerationLocationValues
 	{
-		[Name(value = "生成角度に影響", language = Language.Japanese)]
+		[Name(value = "生成角度に\n影響", language = Language.Japanese)]
 		[Name(value = "Set angle on spawn", language = Language.English)]
 		public Value.Boolean EffectsRotation
 		{

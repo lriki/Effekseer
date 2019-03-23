@@ -146,7 +146,7 @@ namespace Effekseer.GUI.Component
 			if (Manager.NativeManager.DragFloat2EfkEx(id, internalValue, binding.Step / 10.0f,
 				range_1_min, range_1_max,
 				range_2_min, range_2_max,
-				txt_r1 + ":" + "%.3f", txt_r2 + ":" + "%.3f"))
+				txt_r1 + ":" + "%.2g", txt_r2 + ":" + "%.2g"))
 			{
 				if (EnableUndo)
 				{

@@ -267,7 +267,7 @@ namespace Effekseer.Data
 			[Name(language = Language.English, value = "Right Coord")]
 			public Value.Float Position_Fixed_R { get; private set; }
 
-			[Name(language = Language.Japanese, value = "スプラインの分割数")]
+			[Name(language = Language.Japanese, value = "スプラインの\n分割数")]
 			[Description(language = Language.Japanese, value = "スプラインの分割数")]
 			[Name(language = Language.English, value = "The number of \nspline division")]
 			[Description(language = Language.English, value = "The number of spline division")]
@@ -744,7 +744,7 @@ namespace Effekseer.Data
 			[Selected(ID = 12, Value = 0)]
 			public Value.Float TrackSizeBack_Fixed { get; private set; }
 
-			[Name(language = Language.Japanese, value = "スプラインの分割数")]
+			[Name(language = Language.Japanese, value = "スプラインの\n分割数")]
 			[Description(language = Language.Japanese, value = "スプラインの分割数")]
 			[Name(language = Language.English, value = "The number of \nspline division")]
 			[Description(language = Language.English, value = "The number of spline division")]

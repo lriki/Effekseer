@@ -38,7 +38,7 @@ namespace Effekseer.Data
 		public Value.Boolean ZTest { get; private set; }
 
 		[Selector(ID = 0)]
-		[Name(language = Language.Japanese, value = "フェードイン")]
+		[Name(language = Language.Japanese, value = "フェード\nイン")]
 		[Name(language = Language.English, value = "Fade-In")]
 		public Value.Enum<FadeType> FadeInType
 		{
@@ -63,7 +63,7 @@ namespace Effekseer.Data
 		}
 
 		[Selector(ID = 1)]
-		[Name(language = Language.Japanese, value = "フェードアウト")]
+		[Name(language = Language.Japanese, value = "フェード\nアウト")]
 		[Name(language = Language.English, value = "Fade-Out")]
 		public Value.Enum<FadeType> FadeOutType
 		{

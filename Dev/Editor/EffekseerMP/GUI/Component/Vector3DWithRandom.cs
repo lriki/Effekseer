@@ -186,12 +186,13 @@ namespace Effekseer.GUI.Component
 				txt_r2 = Resources.GetString("Min");
 			}
 
-			Manager.NativeManager.PushItemWidth(Manager.NativeManager.GetColumnWidth() - 60);
+			Manager.NativeManager.PushItemWidth(Manager.NativeManager.GetColumnWidth() - 40);
+			Manager.NativeManager.PushStyleVar(swig.ImGuiStyleVarFlags.ItemSpacing, new swig.Vec2(2,4));
 			if (Manager.NativeManager.DragFloat3EfkEx(id1, internalValue1, step, 
 				float.MinValue, float.MaxValue,
 				float.MinValue, float.MaxValue,
 				float.MinValue, float.MaxValue, 
-				"X:%.3f", "Y:%.3f", "Z:%.3f"))
+				"X:%.2g", "Y:%.2g", "Z:%.2g"))
 			{
 				if (EnableUndo)
 				{
@@ -225,7 +226,7 @@ namespace Effekseer.GUI.Component
 				float.MinValue, float.MaxValue,
 				float.MinValue, float.MaxValue,
 				float.MinValue, float.MaxValue, 
-				"X:" + "%.3f", "Y:" + "%.3f", "Z:" + "%.3f"))
+				"X:" + "%.2g", "Y:" + "%.2g", "Z:" + "%.2g"))
 			{
 				if (EnableUndo)
 				{
@@ -261,7 +262,8 @@ namespace Effekseer.GUI.Component
 
 			Manager.NativeManager.SameLine();
 			Manager.NativeManager.Text(txt_r2);
-			
+
+			Manager.NativeManager.PopStyleVar();
 			Manager.NativeManager.PopItemWidth();
 
 			valueChangingProp.Disable();

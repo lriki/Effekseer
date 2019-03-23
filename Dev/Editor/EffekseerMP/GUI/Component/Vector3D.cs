@@ -111,7 +111,7 @@ namespace Effekseer.GUI.Component
 				float.MinValue, float.MaxValue,
 				float.MinValue, float.MaxValue,
 				float.MinValue, float.MaxValue,
-				"X:" + "%.3f", "Y:" + "%.3f", "Z:" + "%.3f"))
+				"X:" + "%.2g", "Y:" + "%.2g", "Z:" + "%.2g"))
 			{
 				FixValueInternal(isActive);
 			}

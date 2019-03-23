@@ -47,7 +47,7 @@ namespace Effekseer.Data
 			private set;
 		}
 
-		[Name(language = Language.Japanese, value = "寿命により削除")]
+		[Name(language = Language.Japanese, value = "寿命により\n削除")]
 		[Name(language = Language.English, value = "Destroy after time")]
 		public Value.Boolean RemoveWhenLifeIsExtinct
 		{
@@ -55,7 +55,7 @@ namespace Effekseer.Data
 			private set;
 		}
 
-		[Name(language = Language.Japanese, value = "親削除時削除")]
+		[Name(language = Language.Japanese, value = "親削除時\n削除")]
 		[Name(language = Language.English, value = "Destroy with parent")]
 		public Value.Boolean RemoveWhenParentIsRemoved
 		{
@@ -63,7 +63,7 @@ namespace Effekseer.Data
 			private set;
 		}
 
-		[Name(language = Language.Japanese, value = "子が全て消滅時削除")]
+		[Name(language = Language.Japanese, value = "子が全て\n消滅時削除")]
 		[Name(language = Language.English, value = "Destroy when no\nmore children")]
 		public Value.Boolean RemoveWhenAllChildrenAreRemoved
 		{

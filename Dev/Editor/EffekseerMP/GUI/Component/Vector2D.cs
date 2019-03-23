@@ -103,7 +103,7 @@ namespace Effekseer.GUI.Component
 			if (Manager.NativeManager.DragFloat2EfkEx(id, internalValue, step,
 				float.MinValue, float.MaxValue,
 				float.MinValue, float.MaxValue,
-				"X:" + "%.3f", "Y:" + "%.3f"))
+				"X:" + "%.2g", "Y:" + "%.2g"))
 			{
 				FixValueInternal(isActive);
 			}

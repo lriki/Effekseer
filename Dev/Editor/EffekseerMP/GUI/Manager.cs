@@ -89,7 +89,7 @@ namespace Effekseer.GUI
 
 		internal static swig.Vec2 WindowSize = new swig.Vec2(1280, 720);
 
-		internal static bool DoesChangeColorOnChangedValue = false;
+		internal static bool DoesChangeColorOnChangedValue = true;
 
 		public static float TextOffsetY {get; private set;}
 
@@ -497,7 +497,7 @@ namespace Effekseer.GUI
 			}
 			
 			SelectOrShowWindow(typeof(Dock.ViewerController), null, swig.DockSlot.Bottom, 0.15f, true);
-			SelectOrShowWindow(typeof(Dock.NodeTreeView), null, swig.DockSlot.Right, 0.3f, true);
+			SelectOrShowWindow(typeof(Dock.NodeTreeView), null, swig.DockSlot.Right, 0.2f, true);
 			var basicPanel = SelectOrShowWindow(typeof(Dock.CommonValues), null, swig.DockSlot.Top, 0.7f, false);
 			SelectOrShowWindow(typeof(Dock.LocationValues), null, swig.DockSlot.Tab, 1.0f, false);
 			SelectOrShowWindow(typeof(Dock.RotationValues), null, swig.DockSlot.Tab, 1.0f, false);
