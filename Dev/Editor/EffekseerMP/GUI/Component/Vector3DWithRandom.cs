@@ -192,7 +192,7 @@ namespace Effekseer.GUI.Component
 				float.MinValue, float.MaxValue,
 				float.MinValue, float.MaxValue,
 				float.MinValue, float.MaxValue, 
-				"X:%.2g", "Y:%.2g", "Z:%.2g"))
+				"X:%.3g", "Y:%.3g", "Z:%.3g"))
 			{
 				if (EnableUndo)
 				{
@@ -226,7 +226,7 @@ namespace Effekseer.GUI.Component
 				float.MinValue, float.MaxValue,
 				float.MinValue, float.MaxValue,
 				float.MinValue, float.MaxValue, 
-				"X:" + "%.2g", "Y:" + "%.2g", "Z:" + "%.2g"))
+				"X:" + "%.3g", "Y:" + "%.3g", "Z:" + "%.3g"))
 			{
 				if (EnableUndo)
 				{

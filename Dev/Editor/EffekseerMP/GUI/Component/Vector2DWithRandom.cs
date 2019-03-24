@@ -178,7 +178,7 @@ namespace Effekseer.GUI.Component
 			if (Manager.NativeManager.DragFloat2EfkEx(id1, internalValue1, step,
 				float.MinValue, float.MaxValue,
 				float.MinValue, float.MaxValue,
-				"X:%.2g", "Y:%.2g"))
+				"X:%.3g", "Y:%.3g"))
 			{
 				if (EnableUndo)
 				{
@@ -209,7 +209,7 @@ namespace Effekseer.GUI.Component
 			if (Manager.NativeManager.DragFloat2EfkEx(id2, internalValue2, step,
 				float.MinValue, float.MaxValue,
 				float.MinValue, float.MaxValue,
-				"X:" + "%.2g", "Y:" + "%.2g"))
+				"X:" + "%.3g", "Y:" + "%.3g"))
 			{
 				if (EnableUndo)
 				{
