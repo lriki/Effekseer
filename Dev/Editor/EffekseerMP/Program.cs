@@ -27,6 +27,7 @@ namespace Effekseer
 			bool gui = true;
 			string input = string.Empty;
 			string output = string.Empty;
+			string format = "efk";
 			string export = string.Empty;
 			float magnification = 0.0f;
 
@@ -50,6 +51,14 @@ namespace Effekseer
 					if (i < args.Length)
 					{
 						output = args[i];
+					}
+				}
+				else if (args[i] == "-f")
+				{
+					i++;
+					if (i < args.Length)
+					{
+						format = args[i];
 					}
 				}
 				else if (args[i] == "-e")
@@ -76,13 +85,13 @@ namespace Effekseer
 
 			if (System.Diagnostics.Debugger.IsAttached)
 			{
-				Exec(gui, input, output, export, magnification);
+				Exec(gui, input, output, export, format, magnification);
 			}
 			else
 			{
 				try
 				{
-					Exec(gui, input, output, export, magnification);
+					Exec(gui, input, output, export, format, magnification);
 				}
 				catch (Exception e)
 				{
@@ -91,7 +100,7 @@ namespace Effekseer
 			}
 		}
 
-		static void Exec(bool gui, string input, string output, string export, float magnification)
+		static void Exec(bool gui, string input, string output, string export, string format, float magnification)
 		{
 			var languageIndex = swig.GUIManager.GetLanguage();
 			Language? language = null;
@@ -170,8 +179,17 @@ namespace Effekseer
 						magnification = Core.Option.Magnification;
 					}
 
-					var binary = Binary.Exporter.Export(magnification);
-					System.IO.File.WriteAllBytes(export, binary);
+					if(format == "gltf")
+					{
+						var exporter = new Effekseer.Exporter.glTFExporter();
+						exporter.Export(export);
+					}
+					else
+					{
+						var binaryExporter = new Binary.Exporter();
+						var binary = binaryExporter.Export(magnification);
+						System.IO.File.WriteAllBytes(export, binary);
+					}
 				}
 			}
 			catch (Exception e)
