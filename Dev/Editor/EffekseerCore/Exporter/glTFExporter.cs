@@ -17,6 +17,7 @@ namespace Effekseer.Exporter
 	{
 		public glTFExporterFormat Format = glTFExporterFormat.glTF;
 		public bool IsContainedTextureAsBinary = false;
+		public float Scale = 1.0f;
 	}
 
 	public class glTFExporter
@@ -47,7 +48,7 @@ namespace Effekseer.Exporter
 
 			var effekseerExtention = new EffekseerExtention();
 
-			var effect = CreateEffect(option.IsContainedTextureAsBinary);
+			var effect = CreateEffect(option.Scale, option.IsContainedTextureAsBinary);
 
 			effekseerExtention.effects.Add(effect.effectName, effect);
 
@@ -114,7 +115,7 @@ namespace Effekseer.Exporter
 			bufferViews.Add(name, bufferView);
 		}
 
-		EffekseerEffect CreateEffect(bool isContainedTextureAsBinary)
+		EffekseerEffect CreateEffect(float scale, bool isContainedTextureAsBinary)
 		{
 			EffekseerEffect effect = new EffekseerEffect();
 
@@ -130,7 +131,7 @@ namespace Effekseer.Exporter
 			effect.effectName = name;
 
 			var binaryExporter = new Binary.Exporter();
-			var binary = binaryExporter.Export(1);
+			var binary = binaryExporter.Export(scale);
 
 			AddBufferView(bodyName, binary);
 

@@ -181,12 +181,15 @@ namespace Effekseer
 
 					if(format == "gltf")
 					{
+						var option = new Effekseer.Exporter.glTFExporterOption();
+						option.Scale = magnification;
 						var exporter = new Effekseer.Exporter.glTFExporter();
-						exporter.Export(export);
+						exporter.Export(export, option);
 					}
 					else if (format == "glb")
 					{
 						var option = new Effekseer.Exporter.glTFExporterOption();
+						option.Scale = magnification;
 						option.Format = Exporter.glTFExporterFormat.glb;
 						var exporter = new Effekseer.Exporter.glTFExporter();
 						exporter.Export(export, option);
