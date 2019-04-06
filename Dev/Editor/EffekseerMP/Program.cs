@@ -184,6 +184,13 @@ namespace Effekseer
 						var exporter = new Effekseer.Exporter.glTFExporter();
 						exporter.Export(export);
 					}
+					else if (format == "glb")
+					{
+						var option = new Effekseer.Exporter.glTFExporterOption();
+						option.Format = Exporter.glTFExporterFormat.glb;
+						var exporter = new Effekseer.Exporter.glTFExporter();
+						exporter.Export(export, option);
+					}
 					else
 					{
 						var binaryExporter = new Binary.Exporter();
