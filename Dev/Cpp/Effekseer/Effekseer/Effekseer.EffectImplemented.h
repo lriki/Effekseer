@@ -84,16 +84,17 @@ public:
 	HolderCollection<void*> models;
 };
 
-/**
-	@brief	エフェクトパラメーター
-	@note
-	エフェクトに設定されたパラメーター。
-*/
 
+
+
+/**
+	@brief	Effect parameter
+*/
 class EffectImplemented : public Effect, public ReferenceObject
 {
 	friend class ManagerImplemented;
 	friend class EffectNodeImplemented;
+	friend class EffectFactory;
 
 protected:
 	ManagerImplemented* m_pManager;

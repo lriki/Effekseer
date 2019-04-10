@@ -95,17 +95,169 @@ static std::u16string getFilenameWithoutExt(const char16_t* path)
 	return std::u16string(ret.data());
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
-Effect* Effect::Create( Manager* manager, void* data, int32_t size, float magnification, const EFK_CHAR* materialPath )
+bool EffectFactory::LoadBody(Effect* effect, const void* data, int32_t size, float magnification, const EFK_CHAR* materialPath)
+{
+	auto effect_ = static_cast<EffectImplemented*>(effect);
+	return effect_->LoadBody((uint8_t*)data, size, magnification);
+}
+
+void EffectFactory::SetTexture(Effect* effect, int32_t index, TextureType type, TextureData* data)
+{
+	auto effect_ = static_cast<EffectImplemented*>(effect);
+
+	if (type == TextureType::Color)
+	{
+		assert(0 <= index && index < effect_->m_ImageCount);
+		effect_->m_pImages[index] = data;
+	}
+
+	if (type == TextureType::Normal)
+	{
+		assert(0 <= index && index < effect_->m_normalImageCount);
+		effect_->m_normalImages[index] = data;
+	}
+
+	if (type == TextureType::Distortion)
+	{
+		assert(0 <= index && index < effect_->m_distortionImageCount);
+		effect_->m_distortionImages[index] = data;
+	}
+}
+
+void EffectFactory::SetSound(Effect* effect, int32_t index, void* data)
+{ 
+	auto effect_ = static_cast<EffectImplemented*>(effect); 
+
+	assert(0 <= index && index < effect_->m_WaveCount);
+	effect_->m_pWaves[index] = data;
+	
+}
+
+void EffectFactory::SetModel(Effect* effect, int32_t index, void* data)
+{ 
+	auto effect_ = static_cast<EffectImplemented*>(effect);
+	assert(0 <= index && index < effect_->m_modelCount);
+	effect_->m_pModels[index] = data;
+}
+
+bool EffectFactory::OnCheckIsBinarySupported(const void* data, int32_t size)
+{ 
+	// EFKS
+	int head = 0;
+	memcpy(&head, data, sizeof(int));
+	if (memcmp(&head, "SKFE", 4) != 0)
+		return false;
+	return false; 
+}
+
+bool EffectFactory::OnCheckIsReloadSupported() { true; }
+
+bool EffectFactory::OnLoading(Effect* effect, const void* data, int32_t size)
+{ 
+	return this->LoadBody(effect, data, size);
+}
+
+void EffectFactory::OnLoadingResource(Effect* effect, const void* data, int32_t size)
+{
+	auto textureLoader = effect->GetSetting()->GetTextureLoader();
+	auto soundLoader = effect->GetSetting()->GetSoundLoader();
+	auto modelLoader = effect->GetSetting()->GetModelLoader();
+
+	if (textureLoader != nullptr)
+	{
+		for (auto i = 0; i < effect->GetColorImageCount(); i++)
+		{
+			textureLoader->Load(effect->GetColorImageCount, TextureType::Color);
+			SetTexture(effect, i, TextureType::Color, nullptr);
+		}
+
+		for (auto i = 0; i < effect->GetNormalImageCount(); i++)
+		{
+			textureLoader->Load(effect->GetColorImageCount, TextureType::Normal);
+			SetTexture(effect, i, TextureType::Normal, nullptr);
+		}
+
+		for (auto i = 0; i < effect->GetDistortionImageCount(); i++)
+		{
+			textureLoader->Load(effect->GetColorImageCount, TextureType::Distortion);
+			SetTexture(effect, i, TextureType::Distortion, nullptr);
+		}
+	}
+
+	if (soundLoader != nullptr)
+	{
+		for (auto i = 0; i < effect->GetWaveCount(); i++)
+		{
+	
+		}
+	}
+
+	if (modelLoader != nullptr)
+	{
+		for (auto i = 0; i < effect->GetModelCount(); i++)
+		{
+		
+		}
+	}
+}
+
+void EffectFactory::OnUnloadingResource(Effect* effect, const void* data, int32_t size) { 
+	auto textureLoader = effect->GetSetting()->GetTextureLoader(); 
+	auto soundLoader = effect->GetSetting()->GetSoundLoader();
+	auto modelLoader = effect->GetSetting()->GetModelLoader();
+
+	if (textureLoader != nullptr)
+	{
+		for (auto i = 0; i < effect->GetColorImageCount(); i++)
+		{
+			textureLoader->Unload(effect->GetColorImage(i));
+			SetTexture(effect, i, TextureType::Color, nullptr);
+		}
+
+		for (auto i = 0; i < effect->GetNormalImageCount(); i++)
+		{
+			textureLoader->Unload(effect->GetNormalImage(i));
+			SetTexture(effect, i, TextureType::Normal, nullptr);
+		}
+
+		for (auto i = 0; i < effect->GetDistortionImageCount(); i++)
+		{
+			textureLoader->Unload(effect->GetDistortionImage(i));
+			SetTexture(effect, i, TextureType::Distortion, nullptr);
+		}
+	}
+
+	if (soundLoader != nullptr)
+	{
+		for (auto i = 0; i < effect->GetWaveCount(); i++)
+		{
+			soundLoader->Unload(effect->GetWave(i));
+			SetSound(effect, i, nullptr);
+		}
+	}
+
+	if (modelLoader != nullptr)
+	{
+		for (auto i = 0; i < effect->GetModelCount(); i++)
+		{
+			modelLoader->Unload(effect->GetModel(i));
+			SetModel(effect, i, nullptr);
+		}
+	}
+}
+
+EffectFactory::EffectFactory() {
+}
+
+EffectFactory::~EffectFactory()
+{
+}
+
+Effect* Effect::Create(Manager * manager, void* data, int32_t size, float magnification, const EFK_CHAR* materialPath)
 {
 	return EffectImplemented::Create( manager, data, size, magnification, materialPath );
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
 Effect* Effect::Create(Manager* manager, const EFK_CHAR* path, float magnification, const EFK_CHAR* materialPath)
 {
 	Setting* setting = manager->GetSetting();
@@ -149,7 +301,7 @@ bool EffectImplemented::LoadBody(uint8_t* data, int32_t size, float mag)
 	memcpy(&m_version, pos, sizeof(int));
 	pos += sizeof(int);
 
-	// 画像
+	// Image
 	memcpy(&m_ImageCount, pos, sizeof(int));
 	pos += sizeof(int);
 
@@ -174,7 +326,7 @@ bool EffectImplemented::LoadBody(uint8_t* data, int32_t size, float mag)
 
 	if (m_version >= 9)
 	{
-		// 画像
+		// Image
 		memcpy(&m_normalImageCount, pos, sizeof(int));
 		pos += sizeof(int);
 
@@ -197,7 +349,7 @@ bool EffectImplemented::LoadBody(uint8_t* data, int32_t size, float mag)
 			}
 		}
 
-		// 画像
+		// Image
 		memcpy(&m_distortionImageCount, pos, sizeof(int));
 		pos += sizeof(int);
 
@@ -223,7 +375,7 @@ bool EffectImplemented::LoadBody(uint8_t* data, int32_t size, float mag)
 
 	if (m_version >= 1)
 	{
-		// ウェーブ
+		// Sound
 		memcpy(&m_WaveCount, pos, sizeof(int));
 		pos += sizeof(int);
 
@@ -249,7 +401,7 @@ bool EffectImplemented::LoadBody(uint8_t* data, int32_t size, float mag)
 
 	if (m_version >= 6)
 	{
-		/* モデル */
+		// Model
 		memcpy(&m_modelCount, pos, sizeof(int));
 		pos += sizeof(int);
 
@@ -282,7 +434,7 @@ bool EffectImplemented::LoadBody(uint8_t* data, int32_t size, float mag)
 		pos += sizeof(int32_t);
 	}
 
-	// 拡大率
+	// magnification
 	if (m_version >= 2)
 	{
 		memcpy(&m_maginification, pos, sizeof(float));
@@ -302,7 +454,7 @@ bool EffectImplemented::LoadBody(uint8_t* data, int32_t size, float mag)
 		m_defaultRandomSeed = -1;
 	}
 
-	// カリング
+	// Culling
 	if (m_version >= 9)
 	{
 		memcpy(&(Culling.Shape), pos, sizeof(int32_t));
@@ -321,7 +473,7 @@ bool EffectImplemented::LoadBody(uint8_t* data, int32_t size, float mag)
 		}
 	}
 
-	// ノード
+	// Nodes
 	m_pRoot = EffectNodeImplemented::Create(this, NULL, pos);
 }
 
@@ -1140,6 +1292,3 @@ EffectTerm EffectImplemented::CalculateTerm() const
 //----------------------------------------------------------------------------------
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
