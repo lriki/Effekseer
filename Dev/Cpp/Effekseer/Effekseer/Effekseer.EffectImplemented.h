@@ -103,6 +103,8 @@ protected:
 
 	mutable std::atomic<int32_t> m_reference;
 
+	std::shared_ptr<EffectFactory> factory;
+
 	int m_version;
 
 	int m_ImageCount;
@@ -234,10 +236,9 @@ public:
 	*/
 	TextureData* GetColorImage(int n) const override;
 
-	/**
-		@brief	格納されている画像のポインタの個数を取得する。
-	*/
 	int32_t GetColorImageCount() const override;
+
+	const EFK_CHAR* GetColorImagePath(int n) const override;
 
 	/**
 	@brief	格納されている画像のポインタを取得する。
@@ -246,23 +247,25 @@ public:
 
 	int32_t GetNormalImageCount() const override;
 
+	const EFK_CHAR* GetNormalImagePath(int n) const override;
+
 	TextureData* GetDistortionImage(int n) const override;
 
 	int32_t GetDistortionImageCount() const override;
 
-	/**
-		@brief	格納されている音波形のポインタを取得する。
-	*/
+	const EFK_CHAR* GetDistortionImagePath(int n) const override;
+
 	void* GetWave(int n) const override;
 
 	int32_t GetWaveCount() const override;
 
-	/**
-		@brief	格納されているモデルのポインタを取得する。
-	*/
+	const EFK_CHAR* GetWavePath(int n) const override;
+
 	void* GetModel(int n) const override;
 
 	int32_t GetModelCount() const override;
+
+	const EFK_CHAR* GetModelPath(int n) const override;
 
 	/**
 		@brief	エフェクトのリロードを行う。

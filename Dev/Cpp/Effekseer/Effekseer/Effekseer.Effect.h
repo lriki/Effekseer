@@ -164,21 +164,21 @@ public:
 		\~English this method is called when load a effect from binary
 		\~Japanese	バイナリからエフェクトを読み込む時に、このメソッドが呼ばれる。
 	*/
-	virtual bool OnLoading(Effect* effect, const void* data, int32_t size);
+	virtual bool OnLoading(Effect* effect, const void* data, int32_t size, float magnification, const EFK_CHAR* materialPath);
 
 	/**
 		@brief
 		\~English this method is called when load resources
 		\~Japanese	リソースを読み込む時に、このメソッドが呼ばれる。
 	*/
-	virtual void OnLoadingResource(Effect* effect, const void* data, int32_t size);
+	virtual void OnLoadingResource(Effect* effect, const void* data, int32_t size, const EFK_CHAR* materialPath);
 
 	/**
 	@brief
 	\~English this method is called when unload resources
 	\~Japanese	リソースを廃棄される時に、このメソッドが呼ばれる。
 	*/
-	virtual void OnUnloadingResource(Effect* effect, const void* data, int32_t size);
+	virtual void OnUnloadingResource(Effect* effect);
 };
 
 /**
@@ -285,6 +285,12 @@ public:
 	virtual int32_t GetColorImageCount() const = 0;
 
 	/**
+	@brief	\~English	Get a color image's path
+	\~Japanese	色画像のパスを取得する。
+	*/
+	virtual const EFK_CHAR* GetColorImagePath(int n) const = 0;
+
+	/**
 	@brief	格納されている法線画像のポインタを取得する。
 	@param	n	[in]	画像のインデックス
 	@return	画像のポインタ
@@ -296,6 +302,12 @@ public:
 	*/
 	virtual int32_t GetNormalImageCount() const = 0;
 
+	/**
+	@brief	\~English	Get a normal image's path
+	\~Japanese	法線画像のパスを取得する。
+	*/
+	virtual const EFK_CHAR* GetNormalImagePath(int n) const = 0;
+	
 	/**
 	@brief	格納されている歪み画像のポインタを取得する。
 	@param	n	[in]	画像のインデックス
@@ -309,6 +321,12 @@ public:
 	virtual int32_t GetDistortionImageCount() const = 0;
 
 	/**
+	@brief	\~English	Get a distortion image's path
+	\~Japanese	歪み画像のパスを取得する。
+	*/
+	virtual const EFK_CHAR* GetDistortionImagePath(int n) const = 0;
+	
+	/**
 		@brief	格納されている音波形のポインタを取得する。
 	*/
 	virtual void* GetWave( int n ) const = 0;
@@ -319,6 +337,12 @@ public:
 	virtual int32_t GetWaveCount() const = 0;
 
 	/**
+	@brief	\~English	Get a wave's path
+	\~Japanese	音波形のパスを取得する。
+	*/
+	virtual const EFK_CHAR* GetWavePath(int n) const = 0;
+	
+	/**
 		@brief	格納されているモデルのポインタを取得する。
 	*/
 	virtual void* GetModel( int n ) const = 0;
@@ -328,6 +352,12 @@ public:
 	*/
 	virtual int32_t GetModelCount() const = 0;
 
+	/**
+	@brief	\~English	Get a model's path
+	\~Japanese	モデルのパスを取得する。
+	*/
+	virtual const EFK_CHAR* GetModelPath(int n) const = 0;
+	
 	/**
 		@brief
 		\~English	Reload this effect

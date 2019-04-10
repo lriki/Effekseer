@@ -150,14 +150,14 @@ bool EffectFactory::OnCheckIsBinarySupported(const void* data, int32_t size)
 	return false; 
 }
 
-bool EffectFactory::OnCheckIsReloadSupported() { true; }
+bool EffectFactory::OnCheckIsReloadSupported() { return true; }
 
-bool EffectFactory::OnLoading(Effect* effect, const void* data, int32_t size)
+bool EffectFactory::OnLoading(Effect* effect, const void* data, int32_t size, float magnification, const EFK_CHAR* materialPath)
 { 
-	return this->LoadBody(effect, data, size);
+	return this->LoadBody(effect, data, size, magnification, materialPath);
 }
 
-void EffectFactory::OnLoadingResource(Effect* effect, const void* data, int32_t size)
+void EffectFactory::OnLoadingResource(Effect* effect, const void* data, int32_t size, const EFK_CHAR* materialPath)
 {
 	auto textureLoader = effect->GetSetting()->GetTextureLoader();
 	auto soundLoader = effect->GetSetting()->GetSoundLoader();
@@ -167,20 +167,29 @@ void EffectFactory::OnLoadingResource(Effect* effect, const void* data, int32_t 
 	{
 		for (auto i = 0; i < effect->GetColorImageCount(); i++)
 		{
-			textureLoader->Load(effect->GetColorImageCount, TextureType::Color);
-			SetTexture(effect, i, TextureType::Color, nullptr);
+			EFK_CHAR fullPath[512];
+			PathCombine(fullPath, materialPath, effect->GetColorImagePath(i));
+
+			auto resource = textureLoader->Load(fullPath, TextureType::Color);
+			SetTexture(effect, i, TextureType::Color, resource);
 		}
 
 		for (auto i = 0; i < effect->GetNormalImageCount(); i++)
 		{
-			textureLoader->Load(effect->GetColorImageCount, TextureType::Normal);
-			SetTexture(effect, i, TextureType::Normal, nullptr);
+			EFK_CHAR fullPath[512];
+			PathCombine(fullPath, materialPath, effect->GetNormalImagePath(i));
+
+			auto resource = textureLoader->Load(fullPath, TextureType::Normal);
+			SetTexture(effect, i, TextureType::Normal, resource);
 		}
 
 		for (auto i = 0; i < effect->GetDistortionImageCount(); i++)
 		{
-			textureLoader->Load(effect->GetColorImageCount, TextureType::Distortion);
-			SetTexture(effect, i, TextureType::Distortion, nullptr);
+			EFK_CHAR fullPath[512];
+			PathCombine(fullPath, materialPath, effect->GetDistortionImagePath(i));
+
+			auto resource = textureLoader->Load(fullPath, TextureType::Distortion);
+			SetTexture(effect, i, TextureType::Distortion, resource);
 		}
 	}
 
@@ -188,7 +197,11 @@ void EffectFactory::OnLoadingResource(Effect* effect, const void* data, int32_t 
 	{
 		for (auto i = 0; i < effect->GetWaveCount(); i++)
 		{
-	
+			EFK_CHAR fullPath[512];
+			PathCombine(fullPath, materialPath, effect->GetWavePath(i));
+
+			auto resource = soundLoader->Load(fullPath);
+			SetSound(effect, i, resource);
 		}
 	}
 
@@ -196,12 +209,16 @@ void EffectFactory::OnLoadingResource(Effect* effect, const void* data, int32_t 
 	{
 		for (auto i = 0; i < effect->GetModelCount(); i++)
 		{
-		
+			EFK_CHAR fullPath[512];
+			PathCombine(fullPath, materialPath, effect->GetModelPath(i));
+
+			auto resource = modelLoader->Load(fullPath);
+			SetModel(effect, i, resource);
 		}
 	}
 }
 
-void EffectFactory::OnUnloadingResource(Effect* effect, const void* data, int32_t size) { 
+void EffectFactory::OnUnloadingResource(Effect* effect) { 
 	auto textureLoader = effect->GetSetting()->GetTextureLoader(); 
 	auto soundLoader = effect->GetSetting()->GetSoundLoader();
 	auto modelLoader = effect->GetSetting()->GetModelLoader();
@@ -475,6 +492,8 @@ bool EffectImplemented::LoadBody(uint8_t* data, int32_t size, float mag)
 
 	// Nodes
 	m_pRoot = EffectNodeImplemented::Create(this, NULL, pos);
+
+	return true;
 }
 
 void EffectImplemented::ResetReloadingBackup()
@@ -707,6 +726,12 @@ bool EffectImplemented::Load( void* pData, int size, float mag, const EFK_CHAR* 
 
 	EffekseerPrintDebug("** Create : Effect\n");
 
+	if(!factory->OnLoading(this, pData, size, mag, materialPath))
+	{
+		return false;
+	}
+
+
 	LoadBody((uint8_t*)pData, size, mag);
 
 	// save materialPath for reloading
@@ -828,6 +853,8 @@ int32_t EffectImplemented::GetColorImageCount() const
 	return m_ImageCount;
 }
 
+const EFK_CHAR* EffectImplemented::GetColorImagePath(int n) const { return m_ImagePaths[n]; }
+
 TextureData* EffectImplemented::GetNormalImage(int n) const
 {
 	/* 強制的に互換をとる */
@@ -843,6 +870,8 @@ int32_t EffectImplemented::GetNormalImageCount() const
 {
 	return m_normalImageCount;
 }
+
+const EFK_CHAR* EffectImplemented::GetNormalImagePath(int n) const { return m_normalImagePaths[n]; }
 
 TextureData* EffectImplemented::GetDistortionImage(int n) const
 {
@@ -860,9 +889,8 @@ int32_t EffectImplemented::GetDistortionImageCount() const
 	return m_distortionImageCount;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
+const EFK_CHAR* EffectImplemented::GetDistortionImagePath(int n) const { return m_distortionImagePaths[n]; }
+
 void* EffectImplemented::GetWave( int n ) const
 {
 	return m_pWaves[ n ];
@@ -873,9 +901,8 @@ int32_t EffectImplemented::GetWaveCount() const
 	return m_WaveCount;
 }
 
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
+const EFK_CHAR* EffectImplemented::GetWavePath(int n) const { return m_WavePaths[n]; }
+
 void* EffectImplemented::GetModel( int n ) const
 {
 	return m_pModels[ n ];
@@ -885,9 +912,9 @@ int32_t EffectImplemented::GetModelCount() const
 {
 	return m_modelCount;
 }
-//----------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------
+
+const EFK_CHAR* EffectImplemented::GetModelPath(int n) const { return m_modelPaths[n]; }
+
 bool EffectImplemented::Reload( void* data, int32_t size, const EFK_CHAR* materialPath, ReloadingThreadType reloadingThreadType)
 {
 	if(m_pManager == NULL ) return false;
@@ -1074,6 +1101,8 @@ void EffectImplemented::ReloadResources( const EFK_CHAR* materialPath )
 		return;
 	}
 
+	factory->OnLoadingResource(this, matPath);
+
 	{
 		TextureLoader* textureLoader = loader->GetTextureLoader();
 		if( textureLoader != NULL )
@@ -1208,6 +1237,9 @@ void EffectImplemented::UnloadResources(const EFK_CHAR* materialPath)
 	{
 		ResetReloadingBackup();
 	}
+
+	factory->OnUnloadingResource(this);
+	return;
 
 	TextureLoader* textureLoader = loader->GetTextureLoader();
 	if (textureLoader != NULL)
