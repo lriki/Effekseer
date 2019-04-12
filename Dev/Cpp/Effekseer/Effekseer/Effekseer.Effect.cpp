@@ -147,7 +147,7 @@ bool EffectFactory::OnCheckIsBinarySupported(const void* data, int32_t size)
 	memcpy(&head, data, sizeof(int));
 	if (memcmp(&head, "SKFE", 4) != 0)
 		return false;
-	return false; 
+	return true; 
 }
 
 bool EffectFactory::OnCheckIsReloadSupported() { return true; }
@@ -699,6 +699,8 @@ EffectImplemented::~EffectImplemented()
 
 	ES_SAFE_RELEASE( m_setting );
 	ES_SAFE_RELEASE( m_pManager );
+
+	ES_SAFE_RELEASE(factory);
 }
 
 //----------------------------------------------------------------------------------
@@ -722,7 +724,45 @@ float EffectImplemented::GetMaginification() const
 //----------------------------------------------------------------------------------
 bool EffectImplemented::Load( void* pData, int size, float mag, const EFK_CHAR* materialPath, ReloadingThreadType reloadingThreadType)
 {
+	if(m_setting != nullptr)
+	{
+		for (int i = 0; i < m_setting->GetEffectFactoryCount(); i++)
+		{
+			auto f = m_setting->GetEffectFactory(i);
+
+			if(f->OnCheckIsBinarySupported(pData, size))
+			{
+				ES_SAFE_ADDREF(f);
+				factory = f;
+				break;
+			}
+		}
+	}
+
+	if (m_pManager != nullptr)
+	{
+		for (int i = 0; i < m_pManager->GetSetting()->GetEffectFactoryCount(); i++)
+		{
+			auto f = m_pManager->GetSetting()->GetEffectFactory(i);
+
+			if (f->OnCheckIsBinarySupported(pData, size))
+			{
+				ES_SAFE_ADDREF(f);
+				factory = f;
+				break;
+			}
+		}
+	}
+
+	if (factory == nullptr)
+		return false;
+
 	// if reladingThreadType == ReloadingThreadType::Main, this function was regarded as loading function actually
+
+	if (!factory->OnCheckIsBinarySupported(pData, size))
+	{
+		return false;
+	}
 
 	EffekseerPrintDebug("** Create : Effect\n");
 
@@ -731,13 +771,10 @@ bool EffectImplemented::Load( void* pData, int size, float mag, const EFK_CHAR* 
 		return false;
 	}
 
-
-	LoadBody((uint8_t*)pData, size, mag);
-
 	// save materialPath for reloading
     if (materialPath != nullptr) m_materialPath = materialPath;
 
-	ReloadResources( materialPath );
+	ReloadResources( pData, size, materialPath);
 	return true;
 }
 
@@ -943,6 +980,9 @@ bool EffectImplemented::Reload( const EFK_CHAR* path, const EFK_CHAR* materialPa
 //----------------------------------------------------------------------------------
 bool EffectImplemented::Reload( Manager** managers, int32_t managersCount, void* data, int32_t size, const EFK_CHAR* materialPath, ReloadingThreadType reloadingThreadType)
 {
+	if (!factory->OnCheckIsReloadSupported())
+		return false;
+
 	const EFK_CHAR* matPath = materialPath != NULL ? materialPath : m_materialPath.c_str();
 	
 	int lockCount = 0;
@@ -981,6 +1021,9 @@ bool EffectImplemented::Reload( Manager** managers, int32_t managersCount, void*
 //----------------------------------------------------------------------------------
 bool EffectImplemented::Reload( Manager** managers, int32_t managersCount, const EFK_CHAR* path, const EFK_CHAR* materialPath, ReloadingThreadType reloadingThreadType)
 {
+	if (!factory->OnCheckIsReloadSupported())
+		return false;
+
 	Setting* loader = GetSetting();
 	
 	EffectLoader* eLoader = loader->GetEffectLoader();
@@ -1023,7 +1066,7 @@ bool EffectImplemented::Reload( Manager** managers, int32_t managersCount, const
 //----------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------
-void EffectImplemented::ReloadResources( const EFK_CHAR* materialPath )
+void EffectImplemented::ReloadResources(const void* data, int32_t size, const EFK_CHAR* materialPath)
 {
 	UnloadResources();
 
@@ -1101,75 +1144,7 @@ void EffectImplemented::ReloadResources( const EFK_CHAR* materialPath )
 		return;
 	}
 
-	factory->OnLoadingResource(this, matPath);
-
-	{
-		TextureLoader* textureLoader = loader->GetTextureLoader();
-		if( textureLoader != NULL )
-		{
-			for( int32_t ind = 0; ind < m_ImageCount; ind++ )
-			{
-				EFK_CHAR fullPath[512];
-				PathCombine( fullPath, matPath, m_ImagePaths[ ind ] );
-				m_pImages[ind] = textureLoader->Load( fullPath, TextureType::Color );
-			}
-		}
-	}
-
-	{
-		TextureLoader* textureLoader = loader->GetTextureLoader();
-		if (textureLoader != NULL)
-		{
-			for (int32_t ind = 0; ind < m_normalImageCount; ind++)
-			{
-				EFK_CHAR fullPath[512];
-				PathCombine(fullPath, matPath, m_normalImagePaths[ind]);
-				m_normalImages[ind] = textureLoader->Load(fullPath, TextureType::Normal);
-			}
-		}
-
-	}
-		{
-			TextureLoader* textureLoader = loader->GetTextureLoader();
-			if (textureLoader != NULL)
-			{
-				for (int32_t ind = 0; ind < m_distortionImageCount; ind++)
-				{
-					EFK_CHAR fullPath[512];
-					PathCombine(fullPath, matPath, m_distortionImagePaths[ind]);
-					m_distortionImages[ind] = textureLoader->Load(fullPath, TextureType::Distortion);
-				}
-			}
-		}
-
-	
-
-	{
-		SoundLoader* soundLoader = loader->GetSoundLoader();
-		if( soundLoader != NULL )
-		{
-			for( int32_t ind = 0; ind < m_WaveCount; ind++ )
-			{
-				EFK_CHAR fullPath[512];
-				PathCombine( fullPath, matPath, m_WavePaths[ ind ] );
-				m_pWaves[ind] = soundLoader->Load( fullPath );
-			}
-		}
-	}
-
-	{
-		ModelLoader* modelLoader = loader->GetModelLoader();
-		
-		if( modelLoader != NULL )
-		{
-			for( int32_t ind = 0; ind < m_modelCount; ind++ )
-			{
-				EFK_CHAR fullPath[512];
-				PathCombine( fullPath, matPath, m_modelPaths[ ind ] );
-				m_pModels[ind] = modelLoader->Load( fullPath );
-			}
-		}
-	}
+	factory->OnLoadingResource(this, data, size, matPath);
 }
 
 void EffectImplemented::UnloadResources(const EFK_CHAR* materialPath)
@@ -1239,51 +1214,6 @@ void EffectImplemented::UnloadResources(const EFK_CHAR* materialPath)
 	}
 
 	factory->OnUnloadingResource(this);
-	return;
-
-	TextureLoader* textureLoader = loader->GetTextureLoader();
-	if (textureLoader != NULL)
-	{
-		for (int32_t ind = 0; ind < m_ImageCount; ind++)
-		{
-			textureLoader->Unload(m_pImages[ind]);
-			m_pImages[ind] = NULL;
-		}
-
-		for (int32_t ind = 0; ind < m_normalImageCount; ind++)
-		{
-			textureLoader->Unload(m_normalImages[ind]);
-			m_normalImages[ind] = NULL;
-		}
-
-		for (int32_t ind = 0; ind < m_distortionImageCount; ind++)
-		{
-			textureLoader->Unload(m_distortionImages[ind]);
-			m_distortionImages[ind] = NULL;
-		}
-	}
-
-	SoundLoader* soundLoader = loader->GetSoundLoader();
-	if (soundLoader != NULL)
-	{
-		for (int32_t ind = 0; ind < m_WaveCount; ind++)
-		{
-			soundLoader->Unload(m_pWaves[ind]);
-			m_pWaves[ind] = NULL;
-		}
-	}
-
-	{
-		ModelLoader* modelLoader = loader->GetModelLoader();
-		if (modelLoader != NULL)
-		{
-			for (int32_t ind = 0; ind < m_modelCount; ind++)
-			{
-				modelLoader->Unload(m_pModels[ind]);
-				m_pModels[ind] = NULL;
-			}
-		}
-	}
 }
 
 void EffectImplemented::UnloadResources()

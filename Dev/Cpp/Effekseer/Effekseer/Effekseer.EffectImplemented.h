@@ -103,7 +103,7 @@ protected:
 
 	mutable std::atomic<int32_t> m_reference;
 
-	std::shared_ptr<EffectFactory> factory;
+	EffectFactory* factory = nullptr;
 
 	int m_version;
 
@@ -299,7 +299,7 @@ public:
 	/**
 		@brief	画像等リソースの再読み込みを行う。
 	*/
-	void ReloadResources(const EFK_CHAR* materialPath) override;
+	void ReloadResources(const void* data, int32_t size, const EFK_CHAR* materialPath) override;
 
 	void UnloadResources(const EFK_CHAR* materialPath);
 
