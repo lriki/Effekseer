@@ -5,8 +5,74 @@ using System.Text;
 
 namespace Effekseer.Data
 {
+#if MATERIAL_ENABLED
+	public class MaterialFileParameter
+	{
+		[Name(language = Language.Japanese, value = "パス")]
+		[Name(language = Language.English, value = "Path")]
+		public Value.PathForMaterial Path
+		{
+			get;
+			private set;
+		}
+
+		[Shown(Shown =false)]
+		[Name(language = Language.Japanese, value = "パラメーター")]
+		[Name(language = Language.English, value = "Paramters")]
+		public Value.ValueList Values
+		{
+			get;
+			private set;
+		}
+
+		Dictionary<object, string> valueToTitle = new Dictionary<object, string>();
+
+		Dictionary<object, string> valueToDescription = new Dictionary<object, string>();
+
+		public MaterialFileParameter()
+		{
+			Path = new Value.PathForMaterial(".efkmat", true);
+			Values = new Value.ValueList();
+		}
+
+		EditableValue[] GetValues()
+		{
+			var ret = new List<EditableValue>();
+
+			// need to filter
+			var propPath = EditableValue.Create(Path, this.GetType().GetProperty("Path"));
+			ret.Add(propPath);
+
+			foreach(var v in Values.Values)
+			{
+				EditableValue ev = new EditableValue();
+				ev.Value = v;
+				ev.Title = valueToTitle[v];
+				ev.Description = valueToDescription[v];
+				ev.IsShown = true;
+				ev.IsUndoEnabled = true;
+				ret.Add(ev);
+			}
+
+			return ret.ToArray();
+		}
+	}
+
+#endif
 	public class RendererCommonValues
 	{
+#if MATERIAL_ENABLED
+		[Selector(ID = 3)]
+		[Name(language = Language.Japanese, value = "マテリアル")]
+		[Name(language = Language.English, value = "Material")]
+		public Value.Enum<MaterialType> Material
+		{
+			get;
+			private set;
+		}
+#endif
+
+		[Selected(ID = 3, Value = 0)]
 		[Name(language = Language.Japanese, value = "色/歪み画像")]
 		[Description(language = Language.Japanese, value = "色/歪みを表す画像")]
 		[Name(language = Language.English, value = "Texture")]
@@ -16,6 +82,16 @@ namespace Effekseer.Data
 			get;
 			private set;
 		}
+
+#if MATERIAL_ENABLED
+		[Selected(ID = 3, Value = 1)]
+		[IO(Export = true)]
+		public MaterialFileParameter MaterialFile
+		{
+			get;
+			private set;
+		}
+#endif
 
 		[Name(language = Language.Japanese, value = "ブレンド")]
 		[Name(language = Language.English, value = "Blend")]
@@ -136,7 +212,11 @@ namespace Effekseer.Data
 
 		internal RendererCommonValues()
 		{
-            ColorTexture = new Value.PathForImage(Resources.GetString("ImageFilter"), true, "");
+#if MATERIAL_ENABLED
+			Material = new Value.Enum<MaterialType>(MaterialType.Default);
+			MaterialFile = new MaterialFileParameter();
+#endif
+			ColorTexture = new Value.PathForImage(Resources.GetString("ImageFilter"), true, "");
 			
 			AlphaBlend = new Value.Enum<AlphaBlendType>(AlphaBlendType.Blend);
 			Filter = new Value.Enum<FilterType>(FilterType.Linear);
@@ -348,6 +428,18 @@ namespace Effekseer.Data
 			}
 		}
 
+#if MATERIAL_ENABLED
+		
+		public enum MaterialType : int
+		{
+			[Name(value = "標準", language = Language.Japanese)]
+			[Name(value = "Default", language = Language.English)]
+			Default,
+			[Name(value = "ファイル", language = Language.Japanese)]
+			[Name(value = "File", language = Language.English)]
+			File,
+		}
+#endif
 		public enum FadeType : int
 		{
 			[Name(value = "有り", language = Language.Japanese)]
