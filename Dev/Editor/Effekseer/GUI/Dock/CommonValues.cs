@@ -28,6 +28,8 @@ namespace Effekseer.GUI.Dock
 				valueName,
 			};
 		}
+
+		public event ChangedValueEventHandler OnChanged;
 	}
 
 #endif

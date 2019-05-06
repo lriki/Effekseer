@@ -19,20 +19,34 @@ namespace Effekseer.Data
 		[Shown(Shown =false)]
 		[Name(language = Language.Japanese, value = "パラメーター")]
 		[Name(language = Language.English, value = "Paramters")]
-		public Value.ValueList Values
+		public Value.ValueList TextureValues
 		{
 			get;
 			private set;
 		}
 
+		public Value.ValueList UniformValues
+		{
+			get;
+			private set;
+		}
+
+
+
 		Dictionary<object, string> valueToTitle = new Dictionary<object, string>();
 
 		Dictionary<object, string> valueToDescription = new Dictionary<object, string>();
 
+		Dictionary<object, bool> valueToShown = new Dictionary<object, bool>();
+
+		Dictionary<object, ValueStatus> valueToStatus = new Dictionary<object, ValueStatus>();
+		Dictionary<string, object> keyToValues = new Dictionary<string, object>();
+
 		public MaterialFileParameter()
 		{
 			Path = new Value.PathForMaterial(".efkmat", true);
-			Values = new Value.ValueList();
+			TextureValues = new Value.ValueList();
+			UniformValues = new Value.ValueList();
 		}
 
 		EditableValue[] GetValues()
@@ -43,19 +57,87 @@ namespace Effekseer.Data
 			var propPath = EditableValue.Create(Path, this.GetType().GetProperty("Path"));
 			ret.Add(propPath);
 
-			foreach(var v in Values.Values)
+			// textures
+			foreach(var v in TextureValues.Values)
 			{
 				EditableValue ev = new EditableValue();
 				ev.Value = v;
 				ev.Title = valueToTitle[v];
 				ev.Description = valueToDescription[v];
-				ev.IsShown = true;
+				ev.IsShown = valueToShown[v];
 				ev.IsUndoEnabled = true;
 				ret.Add(ev);
 			}
 
 			return ret.ToArray();
 		}
+
+		public void ApplyMaterial(Utl.MaterialInformation info)
+		{
+			foreach(var texture in info.Textures)
+			{
+				var key = CreateKey(texture);
+
+				if(keyToValues.ContainsKey(key))
+				{
+					var value = keyToValues[key];
+					var status = valueToStatus[value];
+				}
+				else
+				{
+					var status = new ValueStatus();
+					var value = new Value.PathForImage(".png", false);
+					status.Name = texture.Name;
+					status.Description = "";
+					status.IsShown = texture.IsParam;
+					value.SetAbsolutePathDirectly(texture.DefaultPath);
+					TextureValues.Add(value);
+				}
+			}
+
+			foreach(var uniform in info.Uniforms)
+			{
+				var key = CreateKey(uniform);
+
+				if (keyToValues.ContainsKey(key))
+				{
+					var value = keyToValues[key];
+					var status = valueToStatus[value];
+				}
+				else
+				{
+					var status = new ValueStatus();
+					var value = new Value.Vector3D();
+					status.Name = uniform.Name;
+					status.Description = "";
+					UniformValues.Add(value);
+				}
+			}
+
+			if(OnChanged != null)
+			{
+				OnChanged(this, null);
+			}
+		}
+
+		string CreateKey(Utl.MaterialInformation.UniformInformation info)
+		{
+			return info.Name + "@U" + info.Type;
+		}
+
+		string CreateKey(Utl.MaterialInformation.TextureInformation info)
+		{
+			return info.Name + "@T";
+		}
+
+		class ValueStatus
+		{
+			public string Name = string.Empty;
+			public string Description = string.Empty;
+			public bool IsShown = false;
+		}
+
+		public event ChangedValueEventHandler OnChanged;
 	}
 
 #endif

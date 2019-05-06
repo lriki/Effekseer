@@ -598,6 +598,8 @@ namespace Effekseer.Data
 	public interface IEditableValueCollection
 	{
 		EditableValue[] GetValues();
+
+		event ChangedValueEventHandler OnChanged;
 	}
 
 #endif

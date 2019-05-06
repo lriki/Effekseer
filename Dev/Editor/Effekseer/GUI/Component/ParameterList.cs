@@ -260,6 +260,7 @@ namespace Effekseer.GUI.Component
 						{
 							var o0 = row.BindingValue as Data.Value.EnumBase;
 							var o1 = row.BindingValue as Data.Value.PathForImage;
+							var o2 = row.BindingValue as Data.IEditableValueCollection;
 							if (o0 != null && row.IsSelector)
 							{
 								o0.OnChanged += ChangeSelector;
@@ -267,6 +268,10 @@ namespace Effekseer.GUI.Component
 							else if (o1 != null)
 							{
 								o1.OnChanged += ChangeSelector;
+							}
+							else if (o2 != null)
+							{
+								o2.OnChanged += ChangeSelector;
 							}
 						}
 					}
@@ -312,6 +317,7 @@ namespace Effekseer.GUI.Component
 			{
 				var o0 = row.BindingValue as Data.Value.EnumBase;
 				var o1 = row.BindingValue as Data.Value.PathForImage;
+				var o2 = row.BindingValue as Data.IEditableValueCollection;
 				if (o0 != null && row.IsSelector)
 				{
 					o0.OnChanged -= ChangeSelector;
@@ -319,6 +325,10 @@ namespace Effekseer.GUI.Component
 				else if (o1 != null)
 				{
 					o1.OnChanged -= ChangeSelector;
+				}
+				else if (o2 != null)
+				{
+					o2.OnChanged -= ChangeSelector;
 				}
 			}
 
