@@ -12,12 +12,15 @@ namespace Effekseer.Utl
 #if MATERIAL_ENABLED
 	public class MaterialInformation
 	{
-		public TextureInformation[] Textures;
+		public TextureInformation[] Textures = new TextureInformation[0];
 
-		public UniformInformation[] Uniforms;
+		public UniformInformation[] Uniforms = new UniformInformation[0];
 
 		public void Load(string path)
 		{
+			if (string.IsNullOrEmpty(path))
+				return;
+
 			var jsonText = System.IO.File.ReadAllText(path);
 
 			var parsed = JObject.Parse(jsonText);
@@ -67,7 +70,7 @@ namespace Effekseer.Utl
 				uniforms.Add(info);
 			}
 
-			Uniforms = Uniforms.ToArray();
+			Uniforms = uniforms.ToArray();
 		}
 
 		public class TextureInformation

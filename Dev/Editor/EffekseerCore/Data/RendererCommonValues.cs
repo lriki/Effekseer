@@ -6,8 +6,9 @@ using System.Text;
 namespace Effekseer.Data
 {
 #if MATERIAL_ENABLED
-	public class MaterialFileParameter
+	public class MaterialFileParameter : IEditableValueCollection
 	{
+		[Shown(Shown = true)]
 		[Name(language = Language.Japanese, value = "パス")]
 		[Name(language = Language.English, value = "Path")]
 		public Value.PathForMaterial Path
@@ -31,14 +32,6 @@ namespace Effekseer.Data
 			private set;
 		}
 
-
-
-		Dictionary<object, string> valueToTitle = new Dictionary<object, string>();
-
-		Dictionary<object, string> valueToDescription = new Dictionary<object, string>();
-
-		Dictionary<object, bool> valueToShown = new Dictionary<object, bool>();
-
 		Dictionary<object, ValueStatus> valueToStatus = new Dictionary<object, ValueStatus>();
 		Dictionary<string, object> keyToValues = new Dictionary<string, object>();
 
@@ -47,11 +40,33 @@ namespace Effekseer.Data
 			Path = new Value.PathForMaterial(".efkmat", true);
 			TextureValues = new Value.ValueList();
 			UniformValues = new Value.ValueList();
+
+			Path.OnChanged += Path_OnChanged;
 		}
 
-		EditableValue[] GetValues()
+		private void Path_OnChanged(object sender, ChangedValueEventArgs e)
+		{
+			// Apply values
+			Utl.MaterialInformation info = new Utl.MaterialInformation();
+			info.Load(Path.GetAbsolutePath());
+
+			ApplyMaterial(info);
+		}
+
+		public EditableValue[] GetValues()
 		{
 			var ret = new List<EditableValue>();
+
+			// self
+			{
+				EditableValue ev = new EditableValue();
+				ev.Value = this;
+				ev.Title = "";
+				ev.Description = "";
+				ev.IsShown = true;
+				ev.IsUndoEnabled = false;
+				//ret.Add(ev);
+			}
 
 			// need to filter
 			var propPath = EditableValue.Create(Path, this.GetType().GetProperty("Path"));
@@ -61,10 +76,24 @@ namespace Effekseer.Data
 			foreach(var v in TextureValues.Values)
 			{
 				EditableValue ev = new EditableValue();
+				var status = valueToStatus[v];
 				ev.Value = v;
-				ev.Title = valueToTitle[v];
-				ev.Description = valueToDescription[v];
-				ev.IsShown = valueToShown[v];
+				ev.Title = status.Name;
+				ev.Description = status.Description;
+				ev.IsShown = status.IsShown;
+				ev.IsUndoEnabled = true;
+				ret.Add(ev);
+			}
+
+			// uniforms
+			foreach (var v in UniformValues.Values)
+			{
+				EditableValue ev = new EditableValue();
+				var status = valueToStatus[v];
+				ev.Value = v;
+				ev.Title = status.Name;
+				ev.Description = status.Description;
+				ev.IsShown = status.IsShown;
 				ev.IsUndoEnabled = true;
 				ret.Add(ev);
 			}
@@ -74,7 +103,39 @@ namespace Effekseer.Data
 
 		public void ApplyMaterial(Utl.MaterialInformation info)
 		{
-			foreach(var texture in info.Textures)
+			bool isChanged = false;
+
+			var textureKeys = info.Textures.Select(_ => CreateKey(_)).ToList();
+
+			foreach (var kts in keyToValues)
+			{
+				if(!textureKeys.Contains(kts.Key))
+				{
+					var status = valueToStatus[kts.Value];
+					if(status.IsShown)
+					{
+						status.IsShown = false;
+						isChanged = true;
+					}
+				}
+			}
+
+			var uniformKeys = info.Uniforms.Select(_ => CreateKey(_)).ToList();
+
+			foreach (var kts in keyToValues)
+			{
+				if (!uniformKeys.Contains(kts.Key))
+				{
+					var status = valueToStatus[kts.Value];
+					if (status.IsShown)
+					{
+						status.IsShown = false;
+						isChanged = true;
+					}
+				}
+			}
+
+			foreach (var texture in info.Textures)
 			{
 				var key = CreateKey(texture);
 
@@ -82,6 +143,11 @@ namespace Effekseer.Data
 				{
 					var value = keyToValues[key];
 					var status = valueToStatus[value];
+					if(status.IsShown != texture.IsParam)
+					{
+						status.IsShown = texture.IsParam;
+						isChanged = true;
+					}
 				}
 				else
 				{
@@ -90,8 +156,11 @@ namespace Effekseer.Data
 					status.Name = texture.Name;
 					status.Description = "";
 					status.IsShown = texture.IsParam;
+					keyToValues.Add(key, value);
+					valueToStatus.Add(value, status);
 					value.SetAbsolutePathDirectly(texture.DefaultPath);
 					TextureValues.Add(value);
+					isChanged = true;
 				}
 			}
 
@@ -103,6 +172,11 @@ namespace Effekseer.Data
 				{
 					var value = keyToValues[key];
 					var status = valueToStatus[value];
+					if (!status.IsShown)
+					{
+						status.IsShown = true;
+						isChanged = true;
+					}
 				}
 				else
 				{
@@ -110,11 +184,15 @@ namespace Effekseer.Data
 					var value = new Value.Vector3D();
 					status.Name = uniform.Name;
 					status.Description = "";
+					status.IsShown = true;
+					keyToValues.Add(key, value);
+					valueToStatus.Add(value, status);
 					UniformValues.Add(value);
+					isChanged = true;
 				}
 			}
 
-			if(OnChanged != null)
+			if(isChanged && OnChanged != null)
 			{
 				OnChanged(this, null);
 			}

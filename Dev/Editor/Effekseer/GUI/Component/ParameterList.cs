@@ -41,6 +41,8 @@ namespace Effekseer.GUI.Component
 			{
 				var c = controlRows.Internal[i].Control as IParameterControl;
 
+				if (c is Dummy) continue;
+
 				if (i > 0 &&
 					(controlRows[i - 1].SelectorIndent > controlRows[i].SelectorIndent ||
 					controlRows[i].IsSelector ||
@@ -214,6 +216,7 @@ namespace Effekseer.GUI.Component
 
 						TypeRow row = null;
 
+						if (!editableValue.IsShown) continue;
 
 						if (objToTypeRow.ContainsKey(propValue))
 						{
@@ -257,6 +260,11 @@ namespace Effekseer.GUI.Component
 						newRows.Add(row);
 						localRows.Add(row);
 
+						if (propValue is Data.IEditableValueCollection)
+						{
+							parseObject(propValue, row.SelectorIndent);
+						}
+
 						{
 							var o0 = row.BindingValue as Data.Value.EnumBase;
 							var o1 = row.BindingValue as Data.Value.PathForImage;
@@ -275,7 +283,6 @@ namespace Effekseer.GUI.Component
 							}
 						}
 					}
-
 				};
 
 			parseObject(value, 0);
@@ -523,6 +530,10 @@ namespace Effekseer.GUI.Component
 				{
 					gui = new PathForSound(Title);
 				}
+				else if (type == typeof(Data.Value.PathForMaterial))
+				{
+					gui = new PathForMaterial(Title);
+				}
 				else if (type == typeof(Data.Value.FCurveVector2D))
 				{
 					gui = new FCurveButton(Title);
@@ -534,6 +545,10 @@ namespace Effekseer.GUI.Component
 				else if (type == typeof(Data.Value.FCurveColorRGBA))
 				{
 					gui = new FCurveButton(Title);
+				}
+				else if (editableValue.Value is Data.IEditableValueCollection)
+				{
+					gui = new Dummy(Title);
 				}
 				else if (type == typeof(Data.Value.FCurve<float>))
 				{
