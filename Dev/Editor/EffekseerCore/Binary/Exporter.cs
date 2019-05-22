@@ -9,8 +9,11 @@ namespace Effekseer.Binary
 {
 	public class Exporter
 	{
+#if MATERIAL_ENABLED
+		const int Version = 14;
+#else
 		const int Version = 13;
-
+#endif
 		public HashSet<string> UsedTextures = new HashSet<string>();
 
 		public HashSet<string> UsedNormalTextures = new HashSet<string>();
@@ -56,6 +59,53 @@ namespace Effekseer.Binary
 						}
 						else
 						{
+#if MATERIAL_ENABLED
+							if(_node.RendererCommonValues.Material.Value == Data.RendererCommonValues.MaterialType.Default)
+							{
+								var relative_path = _node.RendererCommonValues.ColorTexture.RelativePath;
+								if (relative_path != string.Empty)
+								{
+									if (_node.RendererCommonValues.Distortion.Value)
+									{
+										if (!UsedDistortionTextures.Contains(relative_path))
+										{
+											UsedDistortionTextures.Add(relative_path);
+										}
+									}
+									else
+									{
+										if (!UsedTextures.Contains(relative_path))
+										{
+											UsedTextures.Add(relative_path);
+										}
+									}
+								}
+							}
+							else if(_node.RendererCommonValues.Material.Value == Data.RendererCommonValues.MaterialType.File)
+							{
+								var info = _node.RendererCommonValues.MaterialFile.MaterialInfo;
+
+								//_node.RendererCommonValues.MaterialFile.TextureValues
+								var relative_path = _node.RendererCommonValues.ColorTexture.RelativePath;
+								if (relative_path != string.Empty)
+								{
+									if (_node.RendererCommonValues.Distortion.Value)
+									{
+										if (!UsedDistortionTextures.Contains(relative_path))
+										{
+											UsedDistortionTextures.Add(relative_path);
+										}
+									}
+									else
+									{
+										if (!UsedTextures.Contains(relative_path))
+										{
+											UsedTextures.Add(relative_path);
+										}
+									}
+								}
+							}
+#else
 							{
 								var relative_path = _node.RendererCommonValues.ColorTexture.RelativePath;
 								if (relative_path != string.Empty)
@@ -76,7 +126,7 @@ namespace Effekseer.Binary
 									}
 								}
 							}
-
+#endif
 							{
 								var relative_path = _node.DrawingValues.Model.NormalTexture.RelativePath;
 								if (relative_path != string.Empty)

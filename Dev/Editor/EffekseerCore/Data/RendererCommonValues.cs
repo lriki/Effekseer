@@ -196,6 +196,14 @@ namespace Effekseer.Data
 			{
 				OnChanged(this, null);
 			}
+
+			MaterialInfo = info;
+		}
+
+		public Utl.MaterialInformation MaterialInfo
+		{
+			get;
+			private set;
 		}
 
 		string CreateKey(Utl.MaterialInformation.UniformInformation info)
