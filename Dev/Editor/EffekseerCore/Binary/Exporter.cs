@@ -83,20 +83,15 @@ namespace Effekseer.Binary
 							}
 							else if(_node.RendererCommonValues.Material.Value == Data.RendererCommonValues.MaterialType.File)
 							{
-								var info = _node.RendererCommonValues.MaterialFile.MaterialInfo;
+								var materialInfo = new Utl.MaterialInformation();
+								materialInfo.Load(_node.RendererCommonValues.MaterialFile.Path.AbsolutePath);
 
-								//_node.RendererCommonValues.MaterialFile.TextureValues
-								var relative_path = _node.RendererCommonValues.ColorTexture.RelativePath;
-								if (relative_path != string.Empty)
+								var textures = _node.RendererCommonValues.MaterialFile.GetTextures(materialInfo);
+
+								foreach (var texture in textures)
 								{
-									if (_node.RendererCommonValues.Distortion.Value)
-									{
-										if (!UsedDistortionTextures.Contains(relative_path))
-										{
-											UsedDistortionTextures.Add(relative_path);
-										}
-									}
-									else
+									var relative_path = texture.RelativePath;
+									if (relative_path != string.Empty)
 									{
 										if (!UsedTextures.Contains(relative_path))
 										{

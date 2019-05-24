@@ -196,14 +196,46 @@ namespace Effekseer.Data
 			{
 				OnChanged(this, null);
 			}
-
-			MaterialInfo = info;
 		}
 
-		public Utl.MaterialInformation MaterialInfo
+		public List<Value.PathForImage> GetTextures(Utl.MaterialInformation info)
 		{
-			get;
-			private set;
+			var ret = new List<Value.PathForImage>();
+
+			foreach(var texture in info.Textures)
+			{
+				var key = CreateKey(texture);
+				if(keyToValues.ContainsKey(key))
+				{
+					ret.Add(keyToValues[key] as Value.PathForImage);
+				}
+				else
+				{
+					ret.Add(null);
+				}
+			}
+
+			return ret;
+		}
+
+		public List<object> GetUniforms(Utl.MaterialInformation info)
+		{
+			var ret = new List<object>();
+
+			foreach (var uniform in info.Uniforms)
+			{
+				var key = CreateKey(uniform);
+				if (keyToValues.ContainsKey(key))
+				{
+					ret.Add(keyToValues[key]);
+				}
+				else
+				{
+					ret.Add(null);
+				}
+			}
+
+			return ret;
 		}
 
 		string CreateKey(Utl.MaterialInformation.UniformInformation info)
