@@ -28,6 +28,10 @@ namespace Effekseer
 
 		static Data.RecordingValues recording = new Data.RecordingValues();
 
+#if MATERIAL_ENABLED
+		static Data.DynamicValues dynamic_ = new Data.DynamicValues();
+#endif
+
 		static int start_frame = 0;
 
 		static int end_frame = 160;
@@ -208,6 +212,12 @@ namespace Effekseer
 			get { return globalValues; }
 		}
 
+#if MATERIAL_ENABLED
+		public static Data.DynamicValues Dynamic
+		{
+			get { return dynamic_; }
+		}
+#endif
 
 		/// <summary>
 		/// 選択中のノード
@@ -563,8 +573,12 @@ namespace Effekseer
 				recording = new Data.RecordingValues();
 			}
 
-            // Add a root node
-            Root.AddChild();
+#if MATERIAL_ENABLED
+			dynamic_ = new Data.DynamicValues();
+#endif
+
+			// Add a root node
+			Root.AddChild();
 			Command.CommandManager.Clear();
 			FullPath = string.Empty;
 			IsChanged = false;

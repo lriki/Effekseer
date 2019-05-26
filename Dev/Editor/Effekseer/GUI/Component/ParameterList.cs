@@ -183,6 +183,13 @@ namespace Effekseer.GUI.Component
 			else
 			{
 				ResetValue();
+
+				if (bindingObject is Data.IEditableValueCollection)
+				{
+					var o2 = bindingObject as Data.IEditableValueCollection;
+					o2.OnChanged -= ChangeSelector;
+				}
+
 				bindingObject = null;
 			}
 		}
@@ -302,6 +309,12 @@ namespace Effekseer.GUI.Component
 			}
 
 			bindingObject = value;
+
+			if(bindingObject is Data.IEditableValueCollection)
+			{
+				var o2 = bindingObject as Data.IEditableValueCollection;
+				o2.OnChanged += ChangeSelector;
+			}
 		}
 
 		void ResetValue()

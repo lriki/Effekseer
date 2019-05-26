@@ -132,6 +132,10 @@ namespace Effekseer.GUI
 			typeof(Dock.Culling),
 			typeof(Dock.Network),
 			typeof(Dock.FileViewer),
+
+#if MATERIAL_ENABLED
+			typeof(Dock.Dynamic),
+#endif
 		};
 
 		static Dock.DockManager dockManager = null;

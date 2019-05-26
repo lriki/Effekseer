@@ -89,6 +89,7 @@
     <Compile Include="GUI\Dock\DepthValues.cs" />
     <Compile Include="GUI\Dock\DockManager.cs" />
     <Compile Include="GUI\Dock\DockPanel.cs" />
+    <Compile Include="GUI\Dock\Dynamic.cs" />
     <Compile Include="GUI\Dock\EffectViwer.cs" />
     <Compile Include="GUI\Dock\FCurves.cs" />
     <Compile Include="GUI\Dock\FileViewer.cs" />

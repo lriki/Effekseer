@@ -337,6 +337,10 @@ namespace Effekseer.GUI.Menu
                 setDockWindow(Resources.GetString("Network"), typeof(Dock.Network), Images.GetIcon("PanelNetwork"));
 				setDockWindow(Resources.GetString("FileViewer"), typeof(Dock.FileViewer), Images.GetIcon("PanelFileViewer"));
 
+#if MATERIAL_ENABLED
+				setDockWindow(Resources.GetString("FileViewer"), typeof(Dock.Dynamic), Images.GetIcon("PanelFileViewer"));
+#endif
+
 				this.Controls.Add(menu);
 			}
 

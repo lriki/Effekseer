@@ -630,6 +630,7 @@ struct ParameterRendererCommon
 		if (version >= 14)
 		{
 			memcpy(&Material, pos, sizeof(int));
+			pos += sizeof(int);
 
 			if (Material == MaterialType::Default)
 			{

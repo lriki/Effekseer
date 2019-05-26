@@ -21,7 +21,7 @@ namespace Effekseer.Binary
 			var hasTexture = true;
 
 #if MATERIAL_ENABLED
-			data.Add((value.Material.Value).GetBytes());
+			data.Add(((int)value.Material.Value).GetBytes());
 
 
 			if (value.Material.Value == Data.RendererCommonValues.MaterialType.Default)
