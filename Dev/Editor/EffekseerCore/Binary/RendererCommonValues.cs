@@ -9,7 +9,11 @@ namespace Effekseer.Binary
 {
 	class RendererCommonValues
 	{
+#if MATERIAL_ENABLED
+		public static byte[] GetBytes(Data.RendererCommonValues value, Dictionary<string, int> texture_and_index, Dictionary<string, int> distortionTexture_and_index, Dictionary<string, int> material_and_index)
+#else
 		public static byte[] GetBytes(Data.RendererCommonValues value, Dictionary<string, int> texture_and_index, Dictionary<string, int> distortionTexture_and_index)
+#endif
 		{
 			List<byte[]> data = new List<byte[]>();
 
@@ -61,6 +65,8 @@ namespace Effekseer.Binary
 				var textures = value.MaterialFile.GetTextures(materialInfo);
 				var uniforms = value.MaterialFile.GetUniforms(materialInfo);
 
+				data.Add(material_and_index[value.MaterialFile.Path.RelativePath].GetBytes());
+				
 
 				data.Add(textures.Count.GetBytes());
 
