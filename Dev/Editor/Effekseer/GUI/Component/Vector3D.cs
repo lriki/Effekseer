@@ -9,12 +9,16 @@ namespace Effekseer.GUI.Component
 	class Vector3D : Control, IParameterControl
 	{
 		string id = "";
+		string id_c = "";
+
 
 		public string Label { get; set; } = string.Empty;
 
 		public string Description { get; set; } = string.Empty;
 
 		bool isActive = false;
+
+		bool isPopupShown = false;
 
 		Data.Value.Vector3D binding = null;
 
@@ -92,7 +96,20 @@ namespace Effekseer.GUI.Component
 
 		public override void Update()
 		{
+			isPopupShown = false;
+
 			if (binding == null) return;
+
+#if MATERIAL_ENABLED
+			if (binding.DynamicParameter != null && binding.DynamicParameter.IsValid)
+			{
+				Manager.NativeManager.Text(binding.DynamicParameter.Name.Value);
+
+				Popup();
+
+				return;
+			}
+#endif
 
 			valueChangingProp.Enable(binding);
 
@@ -118,6 +135,8 @@ namespace Effekseer.GUI.Component
 
 			var isActive_Current = Manager.NativeManager.IsItemActive();
 
+			Popup();
+
 			if (isActive && !isActive_Current)
 			{
 				FixValue();
@@ -126,6 +145,66 @@ namespace Effekseer.GUI.Component
 			isActive = isActive_Current;
 
 			valueChangingProp.Disable();
+		}
+
+		void Popup()
+		{
+			if (isPopupShown) return;
+
+			if (Manager.NativeManager.BeginPopupContextItem(id_c))
+			{
+
+
+
+				var v = Core.Dynamic.Vectors.Values.Select((_, i) => Tuple.Create(_, i)).Where(_ => _.Item1 == binding.DynamicParameter).FirstOrDefault();
+				string selectedID = "Default";
+
+				if (v != null)
+				{
+					selectedID = v.Item1.Name.Value + "###" + v.Item2.ToString();
+				}
+
+				if (Manager.NativeManager.BeginCombo("###Dynamic", selectedID, swig.ComboFlags.None))
+				{
+					{
+						bool is_selected = v != null;
+
+						var name = "Default";
+
+						if (Manager.NativeManager.Selectable(name, is_selected, swig.SelectableFlags.None))
+						{
+							binding.SetDynamicParameter(null);
+						}
+
+						if (is_selected)
+						{
+							Manager.NativeManager.SetItemDefaultFocus();
+						}
+					}
+
+					for (int i = 0; i < Core.Dynamic.Vectors.Values.Count; i++)
+					{
+						bool is_selected = (Core.Dynamic.Vectors.Values[i] == Core.Dynamic.Vectors.Selected);
+
+						var name = Core.Dynamic.Vectors.Values[i].Name.Value + "###" + i.ToString();
+
+						if (Manager.NativeManager.Selectable(name, is_selected, swig.SelectableFlags.None))
+						{
+							binding.SetDynamicParameter(Core.Dynamic.Vectors.Values[i]);
+						}
+
+						if (is_selected)
+						{
+							Manager.NativeManager.SetItemDefaultFocus();
+						}
+					}
+
+					Manager.NativeManager.EndCombo();
+				}
+
+				Manager.NativeManager.EndPopup();
+				isPopupShown = true;
+			}
 		}
 	}
 }
