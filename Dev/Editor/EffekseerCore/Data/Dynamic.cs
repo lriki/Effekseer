@@ -51,7 +51,6 @@ namespace Effekseer.Data
 			get
 			{
 				if (!parent.Values.Any(_ => _ == this)) return false;
-				if (parent.Values.Any(_ => _ != this && _.Name.Value == this.Name.Value)) return false;
 				return true;
 			}
 		}
@@ -227,6 +226,11 @@ namespace Effekseer.Data
 		public DynamicValues()
 		{
 			Inputs = new DynamicInputCollection();
+
+			for(int i = 0; i < 4; i++)
+			{
+				Inputs.Add();
+			}
 
 			Vectors = new DynamicVectorCollection();
 		}

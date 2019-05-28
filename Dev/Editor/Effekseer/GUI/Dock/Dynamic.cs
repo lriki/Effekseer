@@ -9,6 +9,8 @@ namespace Effekseer.GUI.Dock
 {
 	class Dynamic : DockPanel
 	{
+		Component.ParameterList paramerterListInput = null;
+
 		Component.ParameterList paramerterList = null;
 
 		bool isFiestUpdate = true;
@@ -17,6 +19,7 @@ namespace Effekseer.GUI.Dock
 		{
 			Label = Resources.GetString("Culling") + "###Dynamic";
 
+			paramerterListInput = new Component.ParameterList();
 			paramerterList = new Component.ParameterList();
 			
 			Core.OnBeforeLoad += Core_OnBeforeLoad;
@@ -37,6 +40,7 @@ namespace Effekseer.GUI.Dock
 
 		public void FixValues()
 		{
+			paramerterListInput.FixValues();
 			paramerterList.FixValues();
 		}
 
@@ -55,60 +59,19 @@ namespace Effekseer.GUI.Dock
 			{
 			}
 
-			/*
-			 			var v = enums.Select((_, i) => Tuple.Create(_, i)).Where(_ => _.Item1 == selectedValues).FirstOrDefault();
+			Manager.NativeManager.Text("Dynamic Parameter");
 
-			if(Manager.NativeManager.BeginCombo(id, FieldNames[v.Item2], swig.ComboFlags.None, icons[v.Item2]))
+			paramerterListInput.Update();
+
+			Manager.NativeManager.Separator();
+
+			Manager.NativeManager.Text("Calculation");
+
+			var nextParam = Component.DynamicSelector.Select(Core.Dynamic.Vectors.Selected, false, true);
+
+			if (Core.Dynamic.Vectors.Selected != nextParam)
 			{
-				for(int i = 0; i < FieldNames.Count; i++)
-				{
-					bool is_selected = (FieldNames[v.Item2] == FieldNames[i]);
-
-					if (Manager.NativeManager.Selectable(FieldNames[i], is_selected, swig.SelectableFlags.None, icons[i]))
-					{
-						selectedValues = enums[i];
-						binding.SetValue(selectedValues);
-					}
-						
-					if (is_selected)
-					{
-						Manager.NativeManager.SetItemDefaultFocus();
-					}
-
-				}
-
-			}
-
-			 */
-
-			var v = Core.Dynamic.Vectors.Values.Select((_, i) => Tuple.Create(_, i)).Where(_ => _.Item1 == Core.Dynamic.Vectors.Selected).FirstOrDefault();
-			string selectedID = "";
-
-			if(v != null)
-			{
-				selectedID = v.Item1.Name.Value + "###" + v.Item2.ToString();
-			}
-
-			if (Manager.NativeManager.BeginCombo("###Dynamic", selectedID, swig.ComboFlags.None))
-			{
-				for (int i = 0; i < Core.Dynamic.Vectors.Values.Count; i++)
-				{
-					bool is_selected = (Core.Dynamic.Vectors.Values[i] == Core.Dynamic.Vectors.Selected);
-
-					var name = Core.Dynamic.Vectors.Values[i].Name.Value + "###" + i.ToString();
-
-					if (Manager.NativeManager.Selectable(name, is_selected, swig.SelectableFlags.None))
-					{
-						Core.Dynamic.Vectors.Selected = Core.Dynamic.Vectors.Values[i];
-					}
-
-					if (is_selected)
-					{
-						Manager.NativeManager.SetItemDefaultFocus();
-					}
-				}
-
-				Manager.NativeManager.EndCombo();
+				Core.Dynamic.Vectors.Selected = nextParam;
 			}
 
 			if(Manager.NativeManager.Button("Add###DynamicAdd"))
@@ -121,6 +84,7 @@ namespace Effekseer.GUI.Dock
 
 		void Read()
 		{
+			paramerterListInput.SetValue(Core.Dynamic.Inputs);
 			paramerterList.SetValue(Core.Dynamic.Vectors);
 		}
 

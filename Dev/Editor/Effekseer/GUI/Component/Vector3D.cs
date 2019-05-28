@@ -151,60 +151,19 @@ namespace Effekseer.GUI.Component
 		{
 			if (isPopupShown) return;
 
-			if (Manager.NativeManager.BeginPopupContextItem(id_c))
+			if (Manager.NativeManager.BeginPopupContextItem(id))
 			{
+				var nextParam = DynamicSelector.Select(binding.DynamicParameter, true, false);
 
-
-
-				var v = Core.Dynamic.Vectors.Values.Select((_, i) => Tuple.Create(_, i)).Where(_ => _.Item1 == binding.DynamicParameter).FirstOrDefault();
-				string selectedID = "Default";
-
-				if (v != null)
+				if (binding.DynamicParameter != nextParam)
 				{
-					selectedID = v.Item1.Name.Value + "###" + v.Item2.ToString();
-				}
-
-				if (Manager.NativeManager.BeginCombo("###Dynamic", selectedID, swig.ComboFlags.None))
-				{
-					{
-						bool is_selected = v != null;
-
-						var name = "Default";
-
-						if (Manager.NativeManager.Selectable(name, is_selected, swig.SelectableFlags.None))
-						{
-							binding.SetDynamicParameter(null);
-						}
-
-						if (is_selected)
-						{
-							Manager.NativeManager.SetItemDefaultFocus();
-						}
-					}
-
-					for (int i = 0; i < Core.Dynamic.Vectors.Values.Count; i++)
-					{
-						bool is_selected = (Core.Dynamic.Vectors.Values[i] == Core.Dynamic.Vectors.Selected);
-
-						var name = Core.Dynamic.Vectors.Values[i].Name.Value + "###" + i.ToString();
-
-						if (Manager.NativeManager.Selectable(name, is_selected, swig.SelectableFlags.None))
-						{
-							binding.SetDynamicParameter(Core.Dynamic.Vectors.Values[i]);
-						}
-
-						if (is_selected)
-						{
-							Manager.NativeManager.SetItemDefaultFocus();
-						}
-					}
-
-					Manager.NativeManager.EndCombo();
+					binding.SetDynamicParameter(nextParam);
 				}
 
 				Manager.NativeManager.EndPopup();
-				isPopupShown = true;
 			}
+
+			isPopupShown = true;
 		}
 	}
 }
