@@ -21,13 +21,118 @@ namespace Effekseer.InternalScript
 		public List<string> Outputs = new List<string>();
 		public Dictionary<string, object> Attributes = new Dictionary<string, object>();
 	}
+
+	class CompileResult
+	{
+		public byte[] Bytecode = null;
+		public CompileException Error;
+	}
 	class Compiler
 	{
 		List<Operator> operators = new List<Operator>();
 
-		public void Compile()
+		public CompileResult Compile(string code)
 		{
+			CompileResult compileResult = new CompileResult();
+
 			operators.Clear();
+
+			// export
+			List<byte[]> data = new List<byte[]>();
+
+			try
+			{
+				var lexer = new Lexer();
+				var tokens = lexer.Analyze(code);
+
+				var parser = new Parser();
+				var expr = parser.Parse(tokens.Tokens);
+
+				Compile(expr);
+
+				Dictionary<string, int> variableList = new Dictionary<string, int>();
+				foreach (var opt in operators)
+				{
+					foreach (var o in opt.Inputs.Concat(opt.Outputs))
+					{
+						if (IsValidLabel(o)) continue;
+
+						if (!variableList.ContainsKey(o))
+						{
+							variableList.Add(o, variableList.Count);
+						}
+					}
+				}
+
+				int version = 0;
+				data.Add(BitConverter.GetBytes(version));
+				data.Add(BitConverter.GetBytes(variableList.Count));
+				data.Add(BitConverter.GetBytes(operators.Count));
+
+				// Output register
+				var outputName = GetOutputName(expr);
+				if (variableList.ContainsKey(outputName))
+				{
+					var index = variableList[outputName];
+					data.Add(BitConverter.GetBytes(index));
+				}
+				else
+				{
+					var index = GetInputIndex(outputName);
+					data.Add(BitConverter.GetBytes(index));
+				}
+
+				// Operators
+				foreach (var op in operators)
+				{
+					data.Add(BitConverter.GetBytes((int)op.Type));
+					data.Add(BitConverter.GetBytes((int)op.Inputs.Count));
+
+					foreach (var o in op.Inputs)
+					{
+						if (variableList.ContainsKey(o))
+						{
+							var index = variableList[o];
+							data.Add(BitConverter.GetBytes(index));
+						}
+						else
+						{
+							var index = GetInputIndex(o);
+							data.Add(BitConverter.GetBytes(index));
+						}
+					}
+
+					data.Add(BitConverter.GetBytes((int)op.Outputs.Count));
+
+					foreach (var o in op.Outputs)
+					{
+						if (variableList.ContainsKey(o))
+						{
+							var index = variableList[o];
+							data.Add(BitConverter.GetBytes(index));
+						}
+						else
+						{
+							var index = GetInputIndex(o);
+							data.Add(BitConverter.GetBytes(index));
+						}
+					}
+
+					if (op.Type == OperatorType.Constant)
+					{
+						var value = (float)op.Attributes["Constant"];
+						data.Add(BitConverter.GetBytes(value));
+					}
+				}
+			}
+			catch(CompileException e)
+			{
+				compileResult.Error = e;
+				return compileResult;
+			}
+
+			compileResult.Bytecode = data.SelectMany(_ => _).ToArray();
+			return compileResult;
 		}
 
 		void Compile(Expression expr)
@@ -40,21 +145,26 @@ namespace Effekseer.InternalScript
 				if (e.Operator == "-") o.Type = OperatorType.Sub;
 				if (e.Operator == "*") o.Type = OperatorType.Mul;
 				if (e.Operator == "/") o.Type = OperatorType.Div;
-				o.Inputs.Add(e.Lhs.ToString());
-				o.Inputs.Add(e.Rhs.ToString());
-				o.Outputs.Add(e.Line.ToString());
+				o.Inputs.Add(GetOutputName(e.Lhs));
+				o.Inputs.Add(GetOutputName(e.Rhs));
+				o.Outputs.Add(GetOutputName(e));
 				operators.Add(o);
 			}
 			else if(expr is LabelExpression)
 			{
-				
+				var e = expr as LabelExpression;
+				if (!IsValidLabel(e.Value))
+				{
+					throw new CompileException(string.Format("Invalid label {0}", e.Value), e.Line);
+				}
+
 			}
 			else if(expr is NumberExpression)
 			{
 				var e = expr as NumberExpression;
 				var o = new Operator();
 				o.Type = OperatorType.Constant;
-				o.Outputs.Add(e.Line.ToString());
+				o.Outputs.Add(GetOutputName(e));
 				o.Attributes.Add("Constant", e.Value);
 				operators.Add(o);
 			}
@@ -73,19 +183,22 @@ namespace Effekseer.InternalScript
 			}
 		}
 
-		int GetInputIndex(Expression expr)
+		bool IsValidLabel(string label)
 		{
-			if(expr is LabelExpression)
-			{
-				var e = expr as LabelExpression;
+			HashSet<string> valid = new HashSet<string>();
+			valid.Add("$1");
+			valid.Add("$2");
+			valid.Add("$3");
+			valid.Add("$4");
+			return valid.Contains(label);
+		}
 
-				if (e.Value == "$1") return 0;
-				if (e.Value == "$2") return 1;
-				if (e.Value == "$3") return 2;
-				if (e.Value == "$4") return 3;
-
-				throw new Exception();
-			}
+		int GetInputIndex(string label)
+		{
+			if (label == "$1") return 0 + 0xfff;
+			if (label == "$2") return 1 + 0xfff;
+			if (label == "$3") return 2 + 0xfff;
+			if (label == "$4") return 3 + 0xfff;
 
 			throw new Exception();
 		}
