@@ -425,6 +425,34 @@ namespace Effekseer.Binary
 				data.Add(path);
 				data.Add(new byte[] { 0, 0 });
 			}
+
+			// export dynamic parameters
+			data.Add(BitConverter.GetBytes(Core.Dynamic.Vectors.Values.Count));
+
+			var compiler = new InternalScript.Compiler();
+
+			foreach (var value in Core.Dynamic.Vectors.Values)
+			{
+				var cx = compiler.Compile(value.X.Value);
+				var cy = compiler.Compile(value.Y.Value);
+				var cz = compiler.Compile(value.Z.Value);
+				var cw = compiler.Compile(value.W.Value);
+
+				var cs = new []{ cx, cy, cx, cw };
+
+				foreach(var c in cs)
+				{
+					if(c.Bytecode != null)
+					{
+						data.Add(BitConverter.GetBytes((int)c.Bytecode.Length));
+						data.Add(c.Bytecode);
+					}
+					else
+					{
+						data.Add(BitConverter.GetBytes((int)0));
+					}
+				}
+			}
 #endif
 
 			// Export the number of nodes

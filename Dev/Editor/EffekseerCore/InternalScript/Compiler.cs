@@ -118,10 +118,16 @@ namespace Effekseer.InternalScript
 						}
 					}
 
+					// Attribute
 					if (op.Type == OperatorType.Constant)
 					{
+						data.Add(BitConverter.GetBytes(1));
 						var value = (float)op.Attributes["Constant"];
 						data.Add(BitConverter.GetBytes(value));
+					}
+					else
+					{
+						data.Add(BitConverter.GetBytes(0));
 					}
 				}
 			}

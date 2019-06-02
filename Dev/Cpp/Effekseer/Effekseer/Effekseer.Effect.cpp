@@ -497,6 +497,31 @@ bool EffectImplemented::LoadBody(uint8_t* data, int32_t size, float mag)
 				materials_[i] = NULL;
 			}
 		}
+
+		// dynamic parameter
+		int32_t dynamicParameterCount = 0;
+
+		memcpy(&dynamicParameterCount, pos, sizeof(int));
+		pos += sizeof(int);
+
+		if (dynamicParameterCount > 0)
+		{
+			dynamicParameters.resize(dynamicParameterCount);
+
+			for (int dp = 0; dp < dynamicParameters.size(); dp++)
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					int size_ = 0;
+					memcpy(&size_, pos, sizeof(int));
+					pos += sizeof(int);
+
+					dynamicParameters[dp].Elements[i].Load(pos, size_);
+
+					pos += size_;
+				}
+			}
+		}
 	}
 
 	if (m_version >= 13)
