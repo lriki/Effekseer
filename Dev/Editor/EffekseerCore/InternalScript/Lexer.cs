@@ -154,7 +154,7 @@ namespace Effekseer.InternalScript
 		Token ParseOperator(string code, ref int index)
 		{
 			var token = new Token();
-			token.Type = TokenType.Label;
+			token.Type = TokenType.Operator;
 			token.Line = index;
 
 			string str = "";
@@ -177,7 +177,7 @@ namespace Effekseer.InternalScript
 		Token ParseDigit(string code, ref int index)
 		{
 			var token = new Token();
-			token.Type = TokenType.Label;
+			token.Type = TokenType.Digit;
 			token.Line = index;
 
 			string str = "";

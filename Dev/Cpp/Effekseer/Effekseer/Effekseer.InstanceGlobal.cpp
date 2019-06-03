@@ -17,8 +17,8 @@ InstanceGlobal::InstanceGlobal()
 	: m_instanceCount	( 0 )
 	, m_updatedFrame	( 0 )
 	, m_rootContainer	( NULL )
-{
-	
+{ 
+	dynamicInputParameters.fill(0);
 }
 
 //----------------------------------------------------------------------------------

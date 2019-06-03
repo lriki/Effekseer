@@ -438,7 +438,7 @@ namespace Effekseer.Binary
 				var cz = compiler.Compile(value.Z.Value);
 				var cw = compiler.Compile(value.W.Value);
 
-				var cs = new []{ cx, cy, cx, cw };
+				var cs = new []{ cx, cy, cz, cw };
 
 				foreach(var c in cs)
 				{

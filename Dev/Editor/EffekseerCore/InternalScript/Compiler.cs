@@ -37,6 +37,11 @@ namespace Effekseer.InternalScript
 
 			operators.Clear();
 
+			if(string.IsNullOrEmpty(code))
+			{
+				return compileResult;
+			}
+
 			// export
 			List<byte[]> data = new List<byte[]>();
 
@@ -151,6 +156,10 @@ namespace Effekseer.InternalScript
 				if (e.Operator == "-") o.Type = OperatorType.Sub;
 				if (e.Operator == "*") o.Type = OperatorType.Mul;
 				if (e.Operator == "/") o.Type = OperatorType.Div;
+
+				Compile(e.Lhs);
+				Compile(e.Rhs);
+
 				o.Inputs.Add(GetOutputName(e.Lhs));
 				o.Inputs.Add(GetOutputName(e.Rhs));
 				o.Outputs.Add(GetOutputName(e));

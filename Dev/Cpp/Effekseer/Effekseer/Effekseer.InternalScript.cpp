@@ -30,7 +30,7 @@ bool InternalScript::Load(uint8_t* data, int size)
 	}
 
 	operators.resize(size - 16);
-	memcpy(operators.data(), data + sizeof(int) * 3, size - 16);
+	memcpy(operators.data(), data + sizeof(int) * 4, size - 16);
 
 	// check operators
 	int offset = 0;

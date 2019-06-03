@@ -548,8 +548,8 @@ namespace Effekseer.Data
 	public class EditableValue
 	{
 		public object Value;
-		public string Title;
-		public string Description;
+		public string Title = string.Empty;
+		public string Description = string.Empty;
 		public bool IsUndoEnabled;
 		public bool IsShown = true;
 		public int SelectorID = -1;

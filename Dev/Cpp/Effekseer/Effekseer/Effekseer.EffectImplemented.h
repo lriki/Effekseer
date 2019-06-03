@@ -91,7 +91,6 @@ public:
 	std::array<InternalScript, 4> Elements;
 };
 
-
 /**
 	@brief	Effect parameter
 */

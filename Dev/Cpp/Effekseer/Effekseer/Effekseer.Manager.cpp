@@ -1050,6 +1050,22 @@ void ManagerImplemented::SetTargetLocation( Handle handle, const Vector3D& locat
 	}
 }
 
+void ManagerImplemented::SetDynamicParameter(Handle handle, int32_t index, float value) {
+	if (m_DrawSets.count(handle) > 0)
+	{
+		DrawSet& drawSet = m_DrawSets[handle];
+
+		InstanceGlobal* instanceGlobal = drawSet.GlobalPointer;
+
+		if (index < 0 || instanceGlobal->dynamicInputParameters.size() <= index)
+			return;
+
+		instanceGlobal->dynamicInputParameters[index] = value;
+
+		drawSet.IsParameterChanged = true;
+	}
+}
+
 //----------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------
@@ -1384,6 +1400,19 @@ void ManagerImplemented::UpdateHandle( DrawSet& drawSet, float deltaFrame )
 	if (!drawSet.IsPreupdated)
 	{
 		Preupdate(drawSet);
+	}
+
+	// calculate dynamic parameters
+	auto e = static_cast<EffectImplemented*>(drawSet.ParameterPointer);
+	assert(e != nullptr);
+	assert(drawSet.GlobalPointer->dynamicParameters.size() >= e->dynamicParameters.size());
+	for (size_t i = 0; i < e->dynamicParameters.size(); i++)
+	{
+		for (size_t j = 0; j < 4; j++)
+		{
+			drawSet.GlobalPointer->dynamicParameters[i][j] =
+				e->dynamicParameters[i].Elements[j].Execute(drawSet.GlobalPointer->dynamicInputParameters);
+		}
 	}
 
 	float df = drawSet.IsPaused ? 0 : deltaFrame * drawSet.Speed;

@@ -145,8 +145,10 @@ namespace Effekseer.Data
 			}
 		}
 
-		public void Add()
+		public bool Add()
 		{
+			if (values.Count >= 16) return false;
+
 			var old_value = values;
 			var new_value = new List<DynamicVector>(values);
 			new_value.Add(new DynamicVector("", this));
@@ -171,6 +173,8 @@ namespace Effekseer.Data
 				});
 
 			Command.CommandManager.Execute(cmd);
+
+			return true;
 		}
 
 		public EditableValue[] GetValues()

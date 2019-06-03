@@ -40,6 +40,10 @@ private:
 
 	int32_t				m_seed = 0;
 
+	std::array<float, 4> dynamicInputParameters;
+
+	std::array<std::array<float, 4>, 16> dynamicParameters;
+
 	InstanceGlobal();
 
 	virtual ~InstanceGlobal();
