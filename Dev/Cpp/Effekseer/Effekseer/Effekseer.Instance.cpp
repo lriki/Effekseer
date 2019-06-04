@@ -295,7 +295,7 @@ void Instance::Initialize( Instance* parent, int32_t instanceNumber, int32_t par
 		ColorParent = m_pParent->ColorInheritance;
 	}
 
-	/* 位置 */
+	// Translation
 	if( m_pEffectNode->TranslationType == ParameterTranslationType_Fixed )
 	{
 	}
@@ -880,9 +880,19 @@ void Instance::CalculateMatrix( float deltaFrame )
 		}
 		else if( m_pEffectNode->TranslationType == ParameterTranslationType_Fixed )
 		{
-			localPosition.X = m_pEffectNode->TranslationFixed.Position.X;
-			localPosition.Y = m_pEffectNode->TranslationFixed.Position.Y;
-			localPosition.Z = m_pEffectNode->TranslationFixed.Position.Z;
+			if (m_pEffectNode->TranslationFixed.ReferencedDynamicParameter >= 0)
+			{
+				auto dparam = this->m_pContainer->GetRootInstance()->dynamicParameters[m_pEffectNode->TranslationFixed.ReferencedDynamicParameter];
+				localPosition.X = dparam[0];
+				localPosition.Y = dparam[1];
+				localPosition.Z = dparam[2];
+			}
+			else
+			{
+				localPosition.X = m_pEffectNode->TranslationFixed.Position.X;
+				localPosition.Y = m_pEffectNode->TranslationFixed.Position.Y;
+				localPosition.Z = m_pEffectNode->TranslationFixed.Position.Z;
+			}
 		}
 		else if( m_pEffectNode->TranslationType == ParameterTranslationType_PVA )
 		{

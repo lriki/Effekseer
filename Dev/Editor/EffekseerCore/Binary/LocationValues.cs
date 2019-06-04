@@ -18,9 +18,17 @@ namespace Effekseer.Binary
 
 			if (value.Type.GetValue() == Data.LocationValues.ParamaterType.Fixed)
 			{
+#if MATERIAL_ENABLED
+				var refBuf = (value.Fixed.Location.DynamicParameter != null ? Core.Dynamic.Vectors.Values.IndexOf(value.Fixed.Location.DynamicParameter) : -1).GetBytes();
+				var mainBuf = Translation_Fixed_Values.Create(value.Fixed, 1.0f).GetBytes();
+				data.Add((mainBuf.Count() + refBuf.Count()).GetBytes());
+				data.Add(refBuf);
+				data.Add(mainBuf);
+#else
 				var bytes = Translation_Fixed_Values.Create(value.Fixed, 1.0f).GetBytes();
 				data.Add(bytes.Count().GetBytes());
 				data.Add(bytes);
+#endif
 			}
 			else if (value.Type.GetValue() == Data.LocationValues.ParamaterType.PVA)
 			{

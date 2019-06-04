@@ -190,6 +190,7 @@ enum ParameterTranslationType
 //----------------------------------------------------------------------------------
 struct ParameterTranslationFixed
 {
+	int32_t ReferencedDynamicParameter = -1;
 	Vector3D Position;
 };
 
