@@ -113,7 +113,7 @@ namespace Effekseer.InternalScript
 		{
 			var c = code[index];
 			var type = GetElemenetType(c);
-			return type == ElementType.Alphabet;
+			return type == ElementType.Alphabet || type == ElementType.SpecialLetter;
 		}
 		bool StartOperator(string code, int index)
 		{
@@ -141,7 +141,7 @@ namespace Effekseer.InternalScript
 				var c = code[index];
 				var type = GetElemenetType(c);
 
-				if (type != ElementType.Alphabet && type != ElementType.Digit) break;
+				if (type != ElementType.Alphabet && type != ElementType.Digit && type != ElementType.SpecialLetter) break;
 
 				str += c;
 				index++;
@@ -207,6 +207,7 @@ namespace Effekseer.InternalScript
 			if (operators.Contains(c)) return ElementType.Operator;
 			if (c == '(') return ElementType.LeftParentheses;
 			if (c == ')') return ElementType.RightParentheses;
+			if (c == '$') return ElementType.SpecialLetter;
 			return ElementType.Other;
 		}
 
@@ -214,6 +215,7 @@ namespace Effekseer.InternalScript
 		enum ElementType
 		{
 			Alphabet,
+			SpecialLetter,
 			Digit,
 			Space,
 			Operator,
