@@ -22,12 +22,23 @@ namespace Effekseer.InternalScript
 		public Dictionary<string, object> Attributes = new Dictionary<string, object>();
 	}
 
-	class CompileResult
+	public class Test
+	{
+		public Test()
+		{
+			Compiler compiler = new Compiler();
+			compiler.Compile("1 + 2 + 3");
+			compiler.Compile("1 * 2 + 3");
+			compiler.Compile("1 * (2 + 3)");
+		}
+	}
+
+	public class CompileResult
 	{
 		public byte[] Bytecode = null;
 		public CompileException Error;
 	}
-	class Compiler
+	public class Compiler
 	{
 		List<Operator> operators = new List<Operator>();
 

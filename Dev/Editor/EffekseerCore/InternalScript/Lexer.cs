@@ -190,6 +190,9 @@ namespace Effekseer.InternalScript
 				if (type == ElementType.Space) break;
 				if (type == ElementType.Other) break;
 				if (type == ElementType.Operator) break;
+				if (type == ElementType.SpecialLetter) break;
+				if (type == ElementType.LeftParentheses) break;
+				if (type == ElementType.RightParentheses) break;
 
 				str += c;
 				index++;

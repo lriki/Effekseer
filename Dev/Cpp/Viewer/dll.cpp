@@ -830,6 +830,15 @@ bool Native::StepEffect()
 		PlayEffect();
 	}
 
+	// dynamic parameter
+	for (auto h : g_handles)
+	{
+		g_manager->SetDynamicParameter(h.Handle, 0, m_effectBehavior.DynamicInput1);
+		g_manager->SetDynamicParameter(h.Handle, 1, m_effectBehavior.DynamicInput2);
+		g_manager->SetDynamicParameter(h.Handle, 2, m_effectBehavior.DynamicInput3);
+		g_manager->SetDynamicParameter(h.Handle, 3, m_effectBehavior.DynamicInput4);
+	}
+
 	if (m_time % m_step == 0)
 	{
 		m_rootLocation.X += m_effectBehavior.PositionVelocityX;

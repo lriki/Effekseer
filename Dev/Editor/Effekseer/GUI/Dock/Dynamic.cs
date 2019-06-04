@@ -27,11 +27,25 @@ namespace Effekseer.GUI.Dock
 			Core.OnAfterLoad += OnAfterLoad;
 			Core.OnAfterNew += OnAfterLoad;
 			Core.Dynamic.Vectors.OnChanged += Vectors_OnChanged;
+			Core.Dynamic.Inputs.Values[0].Input.OnChanged += Input_OnChanged;
+			Core.Dynamic.Inputs.Values[1].Input.OnChanged += Input_OnChanged;
+			Core.Dynamic.Inputs.Values[2].Input.OnChanged += Input_OnChanged;
+			Core.Dynamic.Inputs.Values[3].Input.OnChanged += Input_OnChanged;
+
 			Read();
 
 			Icon = Images.GetIcon("PanelCulling");
 			IconSize = new swig.Vec2(24, 24);
 			TabToolTip = Resources.GetString("Culling");
+		}
+
+		private void Input_OnChanged(object sender, ChangedValueEventArgs e)
+		{
+			Manager.Viewer.SetDynamicInput(
+				Core.Dynamic.Inputs.Values[0].Input.Value,
+				Core.Dynamic.Inputs.Values[1].Input.Value,
+				Core.Dynamic.Inputs.Values[2].Input.Value,
+				Core.Dynamic.Inputs.Values[3].Input.Value);
 		}
 
 		private void Vectors_OnChanged(object sender, ChangedValueEventArgs e)
@@ -90,12 +104,20 @@ namespace Effekseer.GUI.Dock
 
 		private void Core_OnBeforeNew(object sender, EventArgs e)
 		{
+			Core.Dynamic.Inputs.Values[0].Input.OnChanged -= Input_OnChanged;
+			Core.Dynamic.Inputs.Values[1].Input.OnChanged -= Input_OnChanged;
+			Core.Dynamic.Inputs.Values[2].Input.OnChanged -= Input_OnChanged;
+			Core.Dynamic.Inputs.Values[3].Input.OnChanged -= Input_OnChanged;
 			Core.Dynamic.Vectors.OnChanged -= Vectors_OnChanged;
 			paramerterList.SetValue(null);
 		}
 
 		private void Core_OnBeforeLoad(object sender, EventArgs e)
 		{
+			Core.Dynamic.Inputs.Values[0].Input.OnChanged -= Input_OnChanged;
+			Core.Dynamic.Inputs.Values[1].Input.OnChanged -= Input_OnChanged;
+			Core.Dynamic.Inputs.Values[2].Input.OnChanged -= Input_OnChanged;
+			Core.Dynamic.Inputs.Values[3].Input.OnChanged -= Input_OnChanged;
 			Core.Dynamic.Vectors.OnChanged -= Vectors_OnChanged;
 			paramerterList.SetValue(null);
 		}
@@ -103,6 +125,11 @@ namespace Effekseer.GUI.Dock
 		void OnAfterLoad(object sender, EventArgs e)
 		{
 			Core.Dynamic.Vectors.OnChanged += Vectors_OnChanged;
+			Core.Dynamic.Inputs.Values[0].Input.OnChanged += Input_OnChanged;
+			Core.Dynamic.Inputs.Values[1].Input.OnChanged += Input_OnChanged;
+			Core.Dynamic.Inputs.Values[2].Input.OnChanged += Input_OnChanged;
+			Core.Dynamic.Inputs.Values[3].Input.OnChanged += Input_OnChanged;
+
 			Read();
 		}
 	}

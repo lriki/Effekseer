@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Effekseer.InternalScript
 {
-	class CompileException : System.Exception
+	public class CompileException : System.Exception
 	{
 		public CompileException(string message, int line)
 			: base(message)
@@ -75,87 +75,105 @@ namespace Effekseer.InternalScript
 		{
 			var lhs = Term();
 			
-			var token = Peek();
 
-			if(token != null)
+			while (true)
 			{
-				if(token.Type == TokenType.Operator && (string)token.Value == "*")
-				{
-					Next();
-					var rhs = Term();
+				var token = Peek();
 
-					var ret = new BinOpExpression();
-					ret.Line = token.Line;
-					ret.Lhs = lhs;
-					ret.Rhs = rhs;
-					ret.Operator = (string)token.Value;
-					return ret;
-				}
-				else if (token.Type == TokenType.Operator && (string)token.Value == "/")
+				if (token != null)
 				{
-					Next();
-					var rhs = Term();
+					if (token.Type == TokenType.Operator && (string)token.Value == "*")
+					{
+						Next();
+						var rhs = Term();
 
-					var ret = new BinOpExpression();
-					ret.Line = token.Line;
-					ret.Lhs = lhs;
-					ret.Rhs = rhs;
-					ret.Operator = (string)token.Value;
-					return ret;
+						var ret = new BinOpExpression();
+						ret.Line = token.Line;
+						ret.Lhs = lhs;
+						ret.Rhs = rhs;
+						ret.Operator = (string)token.Value;
+						lhs = ret;
+					}
+					else if (token.Type == TokenType.Operator && (string)token.Value == "/")
+					{
+						Next();
+						var rhs = Term();
+
+						var ret = new BinOpExpression();
+						ret.Line = token.Line;
+						ret.Lhs = lhs;
+						ret.Rhs = rhs;
+						ret.Operator = (string)token.Value;
+						lhs = ret;
+					}
+					else if(token.Type == TokenType.Operator)
+					{
+						break;
+					}
+					else
+					{
+						throw new CompileException(string.Format("Invalid token {0}", token), token.Line);
+					}
 				}
 				else
 				{
-					throw new CompileException(string.Format("Invalid token {0}", token), token.Line);
+					return lhs;
 				}
 			}
-			else
-			{
-				return lhs;
-			}
+
+			return lhs;
 		}
 
 		Expression Term()
 		{
 			var lhs = Group();
-			if (lhs == null) throw new CompileException("Unknown error", -1);
-
-			var token = Peek();
-
-			if (token != null)
+			
+			while (true)
 			{
-				if (token.Type == TokenType.Operator && (string)token.Value == "+")
-				{
-					Next();
-					var rhs = Group();
+				var token = Peek();
 
-					var ret = new BinOpExpression();
-					ret.Line = token.Line;
-					ret.Lhs = lhs;
-					ret.Rhs = rhs;
-					ret.Operator = (string)token.Value;
-					return ret;
-				}
-				else if (token.Type == TokenType.Operator && (string)token.Value == "-")
+				if (token != null)
 				{
-					Next();
-					var rhs = Group();
+					if (token.Type == TokenType.Operator && (string)token.Value == "+")
+					{
+						Next();
+						var rhs = Group();
 
-					var ret = new BinOpExpression();
-					ret.Line = token.Line;
-					ret.Lhs = lhs;
-					ret.Rhs = rhs;
-					ret.Operator = (string)token.Value;
-					return ret;
+						var ret = new BinOpExpression();
+						ret.Line = token.Line;
+						ret.Lhs = lhs;
+						ret.Rhs = rhs;
+						ret.Operator = (string)token.Value;
+						lhs = ret;
+					}
+					else if (token.Type == TokenType.Operator && (string)token.Value == "-")
+					{
+						Next();
+						var rhs = Group();
+
+						var ret = new BinOpExpression();
+						ret.Line = token.Line;
+						ret.Lhs = lhs;
+						ret.Rhs = rhs;
+						ret.Operator = (string)token.Value;
+						lhs = ret;
+					}
+					else if (token.Type == TokenType.Operator)
+					{
+						break;
+					}
+					else
+					{
+						throw new CompileException(string.Format("Invalid token {0}", token), token.Line);
+					}
 				}
 				else
 				{
-					throw new CompileException(string.Format("Invalid token {0}", token), token.Line);
+					return lhs;
 				}
 			}
-			else
-			{
-				return lhs;
-			}
+
+			return lhs;
 		}
 
 		Expression Group()

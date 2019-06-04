@@ -22,6 +22,8 @@ namespace Effekseer
 		[STAThread]
 		static void Main(string[] args)
 		{
+			var test = new Effekseer.InternalScript.Test();
+
 			StartDirectory = System.IO.Directory.GetCurrentDirectory();
 
 			bool gui = true;
