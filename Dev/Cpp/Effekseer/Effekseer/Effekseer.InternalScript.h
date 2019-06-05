@@ -18,6 +18,9 @@ class InternalScript
 		Sub = 2,
 		Mul = 3,
 		Div = 4,
+
+		UnaryAdd = 11,
+		UnarySub = 12,
 	};
 
 
@@ -29,6 +32,8 @@ private:
 	int32_t operatorCount_ = 0;
 	int32_t outputRegister_ = 0;
 	bool isValid_ = false;
+
+	bool IsValidOperator(int value) const;
 
 public:
 	InternalScript();

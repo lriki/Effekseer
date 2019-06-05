@@ -13,6 +13,9 @@ namespace Effekseer.InternalScript
 		Sub = 2,
 		Mul = 3,
 		Div = 4,
+
+		UnaryAdd = 11,
+		UnarySub = 12,
 	}
 	class Operator
 	{
@@ -176,7 +179,20 @@ namespace Effekseer.InternalScript
 				o.Outputs.Add(GetOutputName(e));
 				operators.Add(o);
 			}
-			else if(expr is LabelExpression)
+			else if (expr is UnaryOpExpression)
+			{
+				var e = expr as UnaryOpExpression;
+				var o = new Operator();
+				if (e.Operator == "+") o.Type = OperatorType.UnaryAdd;
+				if (e.Operator == "-") o.Type = OperatorType.UnarySub;
+
+				Compile(e.Expr);
+
+				o.Inputs.Add(GetOutputName(e.Expr));
+				o.Outputs.Add(GetOutputName(e));
+				operators.Add(o);
+			}
+			else if (expr is LabelExpression)
 			{
 				var e = expr as LabelExpression;
 				if (!IsValidLabel(e.Value))

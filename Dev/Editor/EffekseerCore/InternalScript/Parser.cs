@@ -32,6 +32,11 @@ namespace Effekseer.InternalScript
 		public Expression Rhs = null;
 	}
 
+	class UnaryOpExpression : Expression
+	{
+		public string Operator = "";
+		public Expression Expr = null;
+	}
 	class NumberExpression : Expression
 	{
 		public float Value;
@@ -106,7 +111,11 @@ namespace Effekseer.InternalScript
 						ret.Operator = (string)token.Value;
 						lhs = ret;
 					}
-					else if(token.Type == TokenType.Operator)
+					else if (token.Type == TokenType.Operator)
+					{
+						break;
+					}
+					else if (token.Type == TokenType.RightParentheses)
 					{
 						break;
 					}
@@ -162,6 +171,10 @@ namespace Effekseer.InternalScript
 					{
 						break;
 					}
+					else if (token.Type == TokenType.RightParentheses)
+					{
+						break;
+					}
 					else
 					{
 						throw new CompileException(string.Format("Invalid token {0}", token), token.Line);
@@ -182,19 +195,20 @@ namespace Effekseer.InternalScript
 
 			if(token != null)
 			{
-				if(token.Type == TokenType.LeftParentheses)
+				if (token.Type == TokenType.LeftParentheses)
 				{
 					Next();
 					var center = Expr();
-					var right = Next();
+					var right = Peek();
 
-					if(right != null && right.Type == TokenType.RightParentheses)
+					if (right != null && right.Type == TokenType.RightParentheses)
 					{
+						Next();
 						return center;
 					}
 					else
 					{
-						if(token == null)
+						if (token == null)
 						{
 							throw new CompileException(string.Format("Invalid EOF"), token.Line);
 						}
@@ -202,7 +216,18 @@ namespace Effekseer.InternalScript
 						throw new CompileException(string.Format("Invalid token {0}", token), token.Line);
 					}
 				}
-				else if(token.Type == TokenType.Label)
+				else if (token.Type == TokenType.Operator && ((string)token.Value == "+" || (string)token.Value == "-"))
+				{
+					Next();
+					var rhs = Group();
+
+					var ret = new UnaryOpExpression();
+					ret.Line = token.Line;
+					ret.Expr = rhs;
+					ret.Operator = (string)token.Value;
+					return ret;
+				}
+				else if (token.Type == TokenType.Label)
 				{
 					Next();
 					var ret = new LabelExpression((string)token.Value);

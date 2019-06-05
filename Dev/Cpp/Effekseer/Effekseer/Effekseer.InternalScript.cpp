@@ -3,6 +3,16 @@
 namespace Effekseer
 {
 
+bool InternalScript::IsValidOperator(int value) const
+{
+	if (0 <= value && value <= 4)
+		return true;
+	if (11 <= value && value <= 12)
+		return true;
+
+	return false;
+}
+
 InternalScript::InternalScript() {}
 
 InternalScript ::~InternalScript() {}
@@ -44,7 +54,7 @@ bool InternalScript::Load(uint8_t* data, int size)
 		memcpy(&type, operators.data() + offset, sizeof(OperatorType));
 		offset += sizeof(int);
 
-		if ((int)type < 0 || (int)type > 4)
+		if (!IsValidOperator((int)type))
 			return false;
 
 		// input
@@ -167,13 +177,17 @@ float InternalScript::Execute(const std::array<float, 4>& externals)
 
 			if (type == OperatorType::Add)
 				registers[index] = tempInputs[0] + tempInputs[1];
-			if (type == OperatorType::Sub)
+			else if (type == OperatorType::Sub)
 				registers[index] = tempInputs[0] - tempInputs[1];
-			if (type == OperatorType::Mul)
+			else if (type == OperatorType::Mul)
 				registers[index] = tempInputs[0] * tempInputs[1];
-			if (type == OperatorType::Div)
+			else if (type == OperatorType::Div)
 				registers[index] = tempInputs[0] / tempInputs[1];
-			if (type == OperatorType::Constant)
+			else if (type == OperatorType::UnaryAdd)
+				registers[index] = tempInputs[0];
+			else if (type == OperatorType::UnarySub)
+				registers[index] = - tempInputs[0];
+			else if (type == OperatorType::Constant)
 				outputIndex = index;
 		}
 
