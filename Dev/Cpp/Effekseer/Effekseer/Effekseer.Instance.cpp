@@ -301,9 +301,73 @@ void Instance::Initialize( Instance* parent, int32_t instanceNumber, int32_t par
 	}
 	else if( m_pEffectNode->TranslationType == ParameterTranslationType_PVA )
 	{
-		translation_values.random.location = m_pEffectNode->TranslationPVA.location.getValue( *this->m_pContainer->GetRootInstance() );
-		translation_values.random.velocity = m_pEffectNode->TranslationPVA.velocity.getValue(*this->m_pContainer->GetRootInstance());
-		translation_values.random.acceleration = m_pEffectNode->TranslationPVA.acceleration.getValue(*this->m_pContainer->GetRootInstance());
+		if (m_pEffectNode->TranslationPVA.ReferencedDynamicParameterPMax >= 0 &&
+			m_pEffectNode->TranslationPVA.ReferencedDynamicParameterPMin >= 0)
+		{
+			auto dparamMax =
+				this->m_pContainer->GetRootInstance()->dynamicParameters[m_pEffectNode->TranslationPVA.ReferencedDynamicParameterPMax];
+			auto dparamMin =
+				this->m_pContainer->GetRootInstance()->dynamicParameters[m_pEffectNode->TranslationPVA.ReferencedDynamicParameterPMin];
+
+			m_pEffectNode->TranslationPVA.location.max.x = dparamMax[0];
+			m_pEffectNode->TranslationPVA.location.max.y = dparamMax[1];
+			m_pEffectNode->TranslationPVA.location.max.z = dparamMax[2];
+			m_pEffectNode->TranslationPVA.location.min.x = dparamMin[0];
+			m_pEffectNode->TranslationPVA.location.min.y = dparamMin[1];
+			m_pEffectNode->TranslationPVA.location.min.z = dparamMin[2];
+
+			translation_values.random.location = m_pEffectNode->TranslationPVA.location.getValue(*this->m_pContainer->GetRootInstance());
+		}
+		else
+		{
+			translation_values.random.location = m_pEffectNode->TranslationPVA.location.getValue(*this->m_pContainer->GetRootInstance());	
+		}
+
+		if (m_pEffectNode->TranslationPVA.ReferencedDynamicParameterVMax >= 0 &&
+			m_pEffectNode->TranslationPVA.ReferencedDynamicParameterVMin >= 0)
+		{
+			auto dparamMax =
+				this->m_pContainer->GetRootInstance()->dynamicParameters[m_pEffectNode->TranslationPVA.ReferencedDynamicParameterVMax];
+			auto dparamMin =
+				this->m_pContainer->GetRootInstance()->dynamicParameters[m_pEffectNode->TranslationPVA.ReferencedDynamicParameterVMin];
+
+			m_pEffectNode->TranslationPVA.velocity.max.x = dparamMax[0];
+			m_pEffectNode->TranslationPVA.velocity.max.y = dparamMax[1];
+			m_pEffectNode->TranslationPVA.velocity.max.z = dparamMax[2];
+			m_pEffectNode->TranslationPVA.velocity.min.x = dparamMin[0];
+			m_pEffectNode->TranslationPVA.velocity.min.y = dparamMin[1];
+			m_pEffectNode->TranslationPVA.velocity.min.z = dparamMin[2];
+
+			translation_values.random.velocity = m_pEffectNode->TranslationPVA.velocity.getValue(*this->m_pContainer->GetRootInstance());
+		}
+		else
+		{
+			translation_values.random.velocity = m_pEffectNode->TranslationPVA.velocity.getValue(*this->m_pContainer->GetRootInstance());
+		}
+		
+		if (m_pEffectNode->TranslationPVA.ReferencedDynamicParameterAMax >= 0 &&
+			m_pEffectNode->TranslationPVA.ReferencedDynamicParameterAMin >= 0)
+		{
+			auto dparamMax =
+				this->m_pContainer->GetRootInstance()->dynamicParameters[m_pEffectNode->TranslationPVA.ReferencedDynamicParameterAMax];
+			auto dparamMin =
+				this->m_pContainer->GetRootInstance()->dynamicParameters[m_pEffectNode->TranslationPVA.ReferencedDynamicParameterAMin];
+
+			m_pEffectNode->TranslationPVA.acceleration.max.x = dparamMax[0];
+			m_pEffectNode->TranslationPVA.acceleration.max.y = dparamMax[1];
+			m_pEffectNode->TranslationPVA.acceleration.max.z = dparamMax[2];
+			m_pEffectNode->TranslationPVA.acceleration.min.x = dparamMin[0];
+			m_pEffectNode->TranslationPVA.acceleration.min.y = dparamMin[1];
+			m_pEffectNode->TranslationPVA.acceleration.min.z = dparamMin[2];
+
+		translation_values.random.acceleration =
+				m_pEffectNode->TranslationPVA.acceleration.getValue(*this->m_pContainer->GetRootInstance());
+		}
+		else
+		{
+			translation_values.random.acceleration =
+				m_pEffectNode->TranslationPVA.acceleration.getValue(*this->m_pContainer->GetRootInstance());
+		}
 	}
 	else if( m_pEffectNode->TranslationType == ParameterTranslationType_Easing )
 	{

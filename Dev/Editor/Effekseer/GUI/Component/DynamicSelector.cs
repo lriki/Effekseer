@@ -8,7 +8,7 @@ namespace Effekseer.GUI.Component
 {
 	class DynamicSelector
 	{
-		public static Data.DynamicVector Select(Data.DynamicVector currentSelected, bool hasDefault, bool showInvalid)
+		public static Data.DynamicVector Select(string paramName, string id, Data.DynamicVector currentSelected, bool hasDefault, bool showInvalid)
 		{
 			var nextSelected = currentSelected;
 
@@ -24,10 +24,10 @@ namespace Effekseer.GUI.Component
 
 			if (v != null)
 			{
-				selectedID = v.Item1.Name.Value + "###" + v.Item2.ToString();
+				selectedID = v.Item1.Name.Value + "###DynamicVector" + v.Item2.ToString();
 			}
 
-			if (Manager.NativeManager.BeginCombo("###Dynamic", selectedID, swig.ComboFlags.None))
+			if (Manager.NativeManager.BeginCombo(paramName + "###Dynamic" + id, selectedID, swig.ComboFlags.None))
 			{
 
 				if (hasDefault)
@@ -58,11 +58,11 @@ namespace Effekseer.GUI.Component
 
 					if(Core.Dynamic.Vectors.Values[i].Name.Value == string.Empty)
 					{
-						name = "Noname" + "###" + i.ToString();
+						name = "(Noname)" + "###DynamicVector" + i.ToString();
 					}
 					else
 					{
-						name = Core.Dynamic.Vectors.Values[i].Name.Value + "###" + i.ToString();
+						name = Core.Dynamic.Vectors.Values[i].Name.Value + "###DynamicVector" + i.ToString();
 					}
 
 					if (Manager.NativeManager.Selectable(name, is_selected, swig.SelectableFlags.None))

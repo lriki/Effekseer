@@ -191,6 +191,7 @@ enum ParameterTranslationType
 struct ParameterTranslationFixed
 {
 	int32_t ReferencedDynamicParameter = -1;
+
 	Vector3D Position;
 };
 
@@ -199,6 +200,12 @@ struct ParameterTranslationFixed
 //----------------------------------------------------------------------------------
 struct ParameterTranslationPVA
 {
+	int32_t ReferencedDynamicParameterPMax = -1;
+	int32_t ReferencedDynamicParameterPMin = -1;
+	int32_t ReferencedDynamicParameterVMax = -1;
+	int32_t ReferencedDynamicParameterVMin = -1;
+	int32_t ReferencedDynamicParameterAMax = -1;
+	int32_t ReferencedDynamicParameterAMin = -1;
 	random_vector3d	location;
 	random_vector3d	velocity;
 	random_vector3d	acceleration;

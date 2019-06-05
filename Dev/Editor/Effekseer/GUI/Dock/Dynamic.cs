@@ -17,7 +17,7 @@ namespace Effekseer.GUI.Dock
 
 		public Dynamic()
 		{
-			Label = Resources.GetString("Culling") + "###Dynamic";
+			Label = Resources.GetString("DynamicParameter_Name") + "###DynamicParameter";
 
 			paramerterListInput = new Component.ParameterList();
 			paramerterList = new Component.ParameterList();
@@ -73,7 +73,7 @@ namespace Effekseer.GUI.Dock
 			{
 			}
 
-			Manager.NativeManager.Text("Dynamic Parameter");
+			Manager.NativeManager.Text("Dynamic Input");
 
 			paramerterListInput.Update();
 
@@ -81,7 +81,7 @@ namespace Effekseer.GUI.Dock
 
 			Manager.NativeManager.Text("Calculation");
 
-			var nextParam = Component.DynamicSelector.Select(Core.Dynamic.Vectors.Selected, false, true);
+			var nextParam = Component.DynamicSelector.Select("", "", Core.Dynamic.Vectors.Selected, false, true);
 
 			if (Core.Dynamic.Vectors.Selected != nextParam)
 			{

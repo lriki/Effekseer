@@ -153,11 +153,27 @@ namespace Effekseer.GUI.Component
 
 			if (Manager.NativeManager.BeginPopupContextItem(id))
 			{
-				var nextParam = DynamicSelector.Select(binding.DynamicParameter, true, false);
-
-				if (binding.DynamicParameter != nextParam)
+				if (Manager.NativeManager.RadioButton("Default" + id + "_1", !binding.IsDynamicParameterEnabled))
 				{
-					binding.SetDynamicParameter(nextParam);
+					binding.IsDynamicParameterEnabled = false;
+					binding.SetDynamicParameter(null);
+				}
+
+				Manager.NativeManager.SameLine();
+
+				if (Manager.NativeManager.RadioButton("Dynamic" + id + "_2", binding.IsDynamicParameterEnabled))
+				{
+					binding.IsDynamicParameterEnabled = true;
+				}
+
+				if(binding.IsDynamicParameterEnabled)
+				{
+					var nextParam = DynamicSelector.Select("", "", binding.DynamicParameter, false, false);
+
+					if (binding.DynamicParameter != nextParam)
+					{
+						binding.SetDynamicParameter(nextParam);
+					}
 				}
 
 				Manager.NativeManager.EndPopup();

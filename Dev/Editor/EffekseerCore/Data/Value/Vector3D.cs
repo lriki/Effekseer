@@ -26,6 +26,41 @@ namespace Effekseer.Data.Value
 		}
 
 #if MATERIAL_ENABLED
+        bool isDynamicParameterEnabled = false;
+        public bool IsDynamicParameterEnabled
+        {
+            get
+            {
+                return isDynamicParameterEnabled;
+            }
+            set
+            {
+                var old_value = isDynamicParameterEnabled;
+                var new_value = value;
+
+                var cmd = new Command.DelegateCommand(
+                    () =>
+                    {
+                        isDynamicParameterEnabled = new_value;
+
+                        if (OnChanged != null)
+                        {
+                            OnChanged(this, new ChangedValueEventArgs(new_value, ChangedValueType.Execute));
+                        }
+                    },
+                    () =>
+                    {
+                        isDynamicParameterEnabled = old_value;
+
+                        if (OnChanged != null)
+                        {
+                            OnChanged(this, new ChangedValueEventArgs(old_value, ChangedValueType.Unexecute));
+                        }
+                    });
+
+                Command.CommandManager.Execute(cmd);
+            }
+        }
 		public DynamicVector DynamicParameter
 		{
 			get;

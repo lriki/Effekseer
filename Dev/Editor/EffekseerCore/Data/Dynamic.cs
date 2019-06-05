@@ -31,13 +31,11 @@ namespace Effekseer.Data
 
 		public DynamicVector(string name, DynamicVectorCollection parent)
 		{
-			Name = new Value.String();
+			Name = new Value.String(name);
 			X = new Value.String();
 			Y = new Value.String();
 			Z = new Value.String();
 			W = new Value.String();
-
-			Name.SetValueDirectly(name);
 
 			this.parent = parent;
 		}
@@ -151,7 +149,7 @@ namespace Effekseer.Data
 
 			var old_value = values;
 			var new_value = new List<DynamicVector>(values);
-			new_value.Add(new DynamicVector("", this));
+			new_value.Add(new DynamicVector("Param", this));
 
 
 			var cmd = new Command.DelegateCommand(
@@ -180,8 +178,6 @@ namespace Effekseer.Data
 		public EditableValue[] GetValues()
 		{
 			List<EditableValue> ret = new List<EditableValue>();
-
-
 
 			if (selected == null) return ret.ToArray();
 

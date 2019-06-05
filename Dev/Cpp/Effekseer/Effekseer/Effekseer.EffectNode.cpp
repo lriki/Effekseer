@@ -152,11 +152,21 @@ void EffectNodeImplemented::LoadParameter(unsigned char*& pos, EffectNode* paren
 		}
 		else if (TranslationType == ParameterTranslationType_PVA)
 		{
-			memcpy(&size, pos, sizeof(int));
-			pos += sizeof(int);
-			assert(size == sizeof(ParameterTranslationPVA));
-			memcpy(&TranslationPVA, pos, size);
-			pos += size;
+			if (ef->GetVersion() >= 14)
+			{
+				memcpy(&size, pos, sizeof(int));
+				pos += sizeof(int);
+				assert(size == sizeof(ParameterTranslationPVA));
+				memcpy(&TranslationPVA, pos, size);
+				pos += size;
+			}
+			else
+			{
+				memcpy(&size, pos, sizeof(int));
+				pos += sizeof(int);
+				memcpy(&TranslationPVA.location, pos, size);
+				pos += size;
+			}
 		}
 		else if (TranslationType == ParameterTranslationType_Easing)
 		{

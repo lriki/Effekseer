@@ -338,7 +338,7 @@ namespace Effekseer.GUI.Menu
 				setDockWindow(Resources.GetString("FileViewer"), typeof(Dock.FileViewer), Images.GetIcon("PanelFileViewer"));
 
 #if MATERIAL_ENABLED
-				setDockWindow(Resources.GetString("FileViewer"), typeof(Dock.Dynamic), Images.GetIcon("PanelFileViewer"));
+				setDockWindow(Resources.GetString("DynamicParameter_Name"), typeof(Dock.Dynamic), Images.GetIcon("PanelFileViewer"));
 #endif
 
 				this.Controls.Add(menu);
