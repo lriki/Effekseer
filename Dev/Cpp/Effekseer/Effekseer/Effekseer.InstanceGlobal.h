@@ -55,6 +55,8 @@ public:
 
 	std::vector<InstanceContainer*>	RenderedInstanceContainers;
 
+	std::array<float, 4> GetDynamicParameter(int32_t index);
+
 	void SetSeed(int32_t seed);
 
 	virtual float GetRand() override;

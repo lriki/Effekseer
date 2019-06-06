@@ -350,7 +350,7 @@ public:
 
 	std::vector<GLuint>& GetCurrentTextures() { return m_currentTextures; }
 
-	OpenGLDeviceType GetDeviceType() { return m_deviceType; }
+	OpenGLDeviceType GetDeviceType() const override { return m_deviceType; }
 
 	virtual int GetRef() override { return ::Effekseer::ReferenceObject::GetRef(); }
 	virtual int AddRef() override { return ::Effekseer::ReferenceObject::AddRef(); }

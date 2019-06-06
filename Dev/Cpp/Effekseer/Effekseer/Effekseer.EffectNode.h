@@ -499,10 +499,13 @@ struct ParameterRendererCommon
 	*/
 	int32_t				ColorTextureIndex = 0;
 
+	//! material index in MaterialType::File
 	int32_t MaterialIndex = -1;
 
+	//! used textures in MaterialType::File
 	std::vector<int32_t> MaterialColorTextureIndexes;
 
+	//! used uniforms in MaterialType::File
 	std::vector<std::array<float, 4>> MaterialUniforms;
 
 	AlphaBlendType AlphaBlend = AlphaBlendType::Opacity;

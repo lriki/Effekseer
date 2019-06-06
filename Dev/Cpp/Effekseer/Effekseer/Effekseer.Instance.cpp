@@ -305,18 +305,19 @@ void Instance::Initialize( Instance* parent, int32_t instanceNumber, int32_t par
 			m_pEffectNode->TranslationPVA.ReferencedDynamicParameterPMin >= 0)
 		{
 			auto dparamMax =
-				this->m_pContainer->GetRootInstance()->dynamicParameters[m_pEffectNode->TranslationPVA.ReferencedDynamicParameterPMax];
+				this->m_pContainer->GetRootInstance()->GetDynamicParameter(m_pEffectNode->TranslationPVA.ReferencedDynamicParameterPMax);
 			auto dparamMin =
-				this->m_pContainer->GetRootInstance()->dynamicParameters[m_pEffectNode->TranslationPVA.ReferencedDynamicParameterPMin];
+				this->m_pContainer->GetRootInstance()->GetDynamicParameter(m_pEffectNode->TranslationPVA.ReferencedDynamicParameterPMin);
 
-			m_pEffectNode->TranslationPVA.location.max.x = dparamMax[0];
-			m_pEffectNode->TranslationPVA.location.max.y = dparamMax[1];
-			m_pEffectNode->TranslationPVA.location.max.z = dparamMax[2];
-			m_pEffectNode->TranslationPVA.location.min.x = dparamMin[0];
-			m_pEffectNode->TranslationPVA.location.min.y = dparamMin[1];
-			m_pEffectNode->TranslationPVA.location.min.z = dparamMin[2];
+			random_vector3d rv;
+			rv.max.x = dparamMax[0];
+			rv.max.y = dparamMax[1];
+			rv.max.z = dparamMax[2];
+			rv.min.x = dparamMin[0];
+			rv.min.y = dparamMin[1];
+			rv.min.z = dparamMin[2];
 
-			translation_values.random.location = m_pEffectNode->TranslationPVA.location.getValue(*this->m_pContainer->GetRootInstance());
+			translation_values.random.location = rv.getValue(*this->m_pContainer->GetRootInstance());
 		}
 		else
 		{

@@ -34,6 +34,7 @@ struct StandardRendererState
 	::Effekseer::TextureFilterType		TextureFilterType;
 	::Effekseer::TextureWrapType		TextureWrapType;
 	::Effekseer::TextureData*			TexturePtr;
+	::Effekseer::MaterialData*			MaterialPtr;
 
 	StandardRendererState()
 	{
@@ -48,6 +49,7 @@ struct StandardRendererState
 		TextureFilterType = ::Effekseer::TextureFilterType::Nearest;
 		TextureWrapType = ::Effekseer::TextureWrapType::Repeat;
 		TexturePtr = nullptr;
+		MaterialPtr = nullptr;
 	}
 
 	bool operator != (const StandardRendererState state)
@@ -61,6 +63,8 @@ struct StandardRendererState
 		if (TextureFilterType != state.TextureFilterType) return true;
 		if (TextureWrapType != state.TextureWrapType) return true;
 		if (TexturePtr != state.TexturePtr) return true;
+		if (MaterialPtr != state.MaterialPtr) return true;
+
 		return false;
 	}
 };

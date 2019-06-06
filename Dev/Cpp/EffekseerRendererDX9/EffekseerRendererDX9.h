@@ -78,7 +78,7 @@ enum class UVStyle
 };
 
 class Renderer
-	: ::Effekseer::IReference
+	: public ::Effekseer::IReference
 {
 protected:
 	Renderer();

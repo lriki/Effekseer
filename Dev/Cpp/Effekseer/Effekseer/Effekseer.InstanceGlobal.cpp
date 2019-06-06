@@ -29,6 +29,11 @@ InstanceGlobal::~InstanceGlobal()
 	
 }
 
+std::array<float, 4> InstanceGlobal::GetDynamicParameter(int32_t index) {
+	assert(0 <= index && index < dynamicParameters.size());
+	return dynamicParameters[index];
+}
+
 void InstanceGlobal::SetSeed(int32_t seed)
 {
 	m_seed = seed;
