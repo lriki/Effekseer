@@ -210,7 +210,7 @@ namespace Effekseer.InternalScript
 			if (operators.Contains(c)) return ElementType.Operator;
 			if (c == '(') return ElementType.LeftParentheses;
 			if (c == ')') return ElementType.RightParentheses;
-			if (c == '$') return ElementType.SpecialLetter;
+			if (c == '@') return ElementType.SpecialLetter;
 			return ElementType.Other;
 		}
 
