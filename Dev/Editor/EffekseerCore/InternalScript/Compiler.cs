@@ -25,17 +25,6 @@ namespace Effekseer.InternalScript
 		public Dictionary<string, object> Attributes = new Dictionary<string, object>();
 	}
 
-	public class Test
-	{
-		public Test()
-		{
-			Compiler compiler = new Compiler();
-			compiler.Compile("1 + 2 + 3");
-			compiler.Compile("1 * 2 + 3");
-			compiler.Compile("1 * (2 + 3)");
-		}
-	}
-
 	public class CompileResult
 	{
 		public byte[] Bytecode = null;

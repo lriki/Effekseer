@@ -34,6 +34,7 @@ private:
 	bool isValid_ = false;
 
 	bool IsValidOperator(int value) const;
+	float GetRegisterValue(int index, const std::array<float, 4>& externals) const;
 
 public:
 	InternalScript();

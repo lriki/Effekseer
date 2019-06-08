@@ -6,20 +6,6 @@ using System.Threading.Tasks;
 
 namespace Effekseer.InternalScript
 {
-	public class CompileException : System.Exception
-	{
-		public CompileException(string message, int line)
-			: base(message)
-		{
-			Line = line;
-		}
-		public int Line
-		{
-			get;
-			private set;
-		}
-	}
-
 	class Expression
 	{
 		public int Line = 0;

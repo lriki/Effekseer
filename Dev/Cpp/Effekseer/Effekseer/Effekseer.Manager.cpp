@@ -1397,11 +1397,6 @@ void ManagerImplemented::UpdateHandle( Handle handle, float deltaFrame )
 //----------------------------------------------------------------------------------
 void ManagerImplemented::UpdateHandle( DrawSet& drawSet, float deltaFrame )
 {
-	if (!drawSet.IsPreupdated)
-	{
-		Preupdate(drawSet);
-	}
-
 	// calculate dynamic parameters
 	auto e = static_cast<EffectImplemented*>(drawSet.ParameterPointer);
 	assert(e != nullptr);
@@ -1413,6 +1408,11 @@ void ManagerImplemented::UpdateHandle( DrawSet& drawSet, float deltaFrame )
 			drawSet.GlobalPointer->dynamicParameters[i][j] =
 				e->dynamicParameters[i].Elements[j].Execute(drawSet.GlobalPointer->dynamicInputParameters);
 		}
+	}
+
+	if (!drawSet.IsPreupdated)
+	{
+		Preupdate(drawSet);
 	}
 
 	float df = drawSet.IsPaused ? 0 : deltaFrame * drawSet.Speed;

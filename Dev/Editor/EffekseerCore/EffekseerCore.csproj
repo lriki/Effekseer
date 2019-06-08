@@ -133,8 +133,10 @@
     <Compile Include="Define.cs" />
     <Compile Include="Exporter\glTFExporter.cs" />
     <Compile Include="InternalScript\Compiler.cs" />
+    <Compile Include="InternalScript\Exceptions.cs" />
     <Compile Include="InternalScript\Lexer.cs" />
     <Compile Include="InternalScript\Parser.cs" />
+    <Compile Include="InternalScript\Tests.cs" />
     <Compile Include="Utl\MaterialInformation.cs" />
     <Compile Include="Utl\ModelInformation.cs" />
     <Compile Include="Utl\ParamaterTreeNode.cs" />

@@ -13,6 +13,18 @@ bool InternalScript::IsValidOperator(int value) const
 	return false;
 }
 
+float InternalScript::GetRegisterValue(int index, const std::array<float, 4>& externals) const
+{
+	if (index < registers.size())
+	{
+		return registers[index];
+	}
+	else
+	{
+		return externals[index - 0xfff];
+	}
+}
+
 InternalScript::InternalScript() {}
 
 InternalScript ::~InternalScript() {}
@@ -153,14 +165,7 @@ float InternalScript::Execute(const std::array<float, 4>& externals)
 			memcpy(&index, operators.data() + offset, sizeof(int));
 			offset += sizeof(int);
 
-			if (index < registers.size())
-			{
-				tempInputs[j] = registers[index];
-			}
-			else
-			{
-				tempInputs[j] = externals[index - 0xfff];
-			}
+			tempInputs[j] = GetRegisterValue(outputRegister_, externals);
 		}
 
 		int32_t outputCount = 0;
@@ -206,7 +211,7 @@ float InternalScript::Execute(const std::array<float, 4>& externals)
 		}
 	}
 
-	return registers[outputRegister_];
+	return GetRegisterValue(outputRegister_, externals);
 }
 
 } // namespace Effekseer

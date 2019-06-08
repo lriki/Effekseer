@@ -76,13 +76,13 @@ struct StandardRendererState
 		if (MaterialUniformCount != state.MaterialUniformCount) return true;
 		if (MaterialTextureCount != state.MaterialTextureCount) return true;
 
-		for (size_t i = 0; i < state.MaterialUniformCount; i++)
+		for (int32_t i = 0; i < state.MaterialUniformCount; i++)
 		{
 			if (MaterialUniforms[i] != state.MaterialUniforms[i])
 				return true;
 		}
 
-		for (size_t i = 0; i < state.MaterialTextureCount; i++)
+		for (int32_t i = 0; i < state.MaterialTextureCount; i++)
 		{
 			if (MaterialTextures[i] != state.MaterialTextures[i])
 				return true;
@@ -294,8 +294,7 @@ public:
 			if (m_state.MaterialPtr->UniformCount != m_state.MaterialUniformCount)
 				return;
 
-			if
-				m_state.(m_state.TexturePtr->UniformCount != m_state.MaterialTextureCount)
+			if (m_state.MaterialPtr->TextureCount != m_state.MaterialTextureCount)
 				return;
 		}
 		else
@@ -352,7 +351,12 @@ public:
 			vcb.uvInversed[1] = 1;
 		}
 
-		m_renderer->SetVertexBufferToShader(&vcb, sizeof(VertexConstantBuffer));
+		m_renderer->SetVertexBufferToShader(&vcb, sizeof(VertexConstantBuffer), 0);
+
+		if (m_state.MaterialPtr != nullptr)
+		{
+			// TODO
+		}
 
 		if (distortion)
 		{
@@ -370,7 +374,17 @@ public:
 				pcb.uvInversed[1] = 1.0f;
 			}
 	
-			m_renderer->SetPixelBufferToShader(&pcb, sizeof(DistortionPixelConstantBuffer));
+			m_renderer->SetPixelBufferToShader(&pcb, sizeof(DistortionPixelConstantBuffer), 0);
+		}
+		else
+		{
+			if (m_state.MaterialPtr != nullptr)
+			{
+				for (size_t i = 0; i < m_state.MaterialUniformCount; i++)
+				{					
+					m_renderer->SetPixelBufferToShader(m_state.MaterialUniforms[i].data(), sizeof(float) * 4, sizeof(float) * 4 * i);
+				}
+			}
 		}
 
 		shader_->SetConstantBuffer();

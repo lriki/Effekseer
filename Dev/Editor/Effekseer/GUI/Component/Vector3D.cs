@@ -151,6 +151,7 @@ namespace Effekseer.GUI.Component
 		{
 			if (isPopupShown) return;
 
+#if MATERIAL_ENABLED
 			if (Manager.NativeManager.BeginPopupContextItem(id))
 			{
 				if (Manager.NativeManager.RadioButton("Default" + id + "_1", !binding.IsDynamicParameterEnabled))
@@ -178,7 +179,7 @@ namespace Effekseer.GUI.Component
 
 				Manager.NativeManager.EndPopup();
 			}
-
+#endif
 			isPopupShown = true;
 		}
 	}
