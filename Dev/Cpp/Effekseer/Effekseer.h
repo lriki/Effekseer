@@ -509,7 +509,26 @@ struct TextureData
 */
 struct MaterialData
 {
+	int32_t TextureCount = 0;
+	int32_t UniformCount = 0;
+
 	void* UserPtr = nullptr;
+};
+
+/**
+	@brief	\~english	Material parameter for shaders
+			\~japanese	シェーダー向けマテリアルパラメーター
+*/
+struct MaterialParameter
+{
+	//! material index in MaterialType::File
+	int32_t MaterialIndex = -1;
+
+	//! used textures in MaterialType::File
+	std::vector<int32_t> MaterialColorTextureIndexes;
+
+	//! used uniforms in MaterialType::File
+	std::vector<std::array<float, 4>> MaterialUniforms;
 };
 
 //----------------------------------------------------------------------------------
@@ -2547,6 +2566,8 @@ public:
 		bool				IsDepthOffsetScaledWithParticleScale;
 
 		ZSortType			ZSort;
+
+		MaterialParameter* MaterialParameterPtr = nullptr;
 	};
 
 	struct InstanceParameter

@@ -34,7 +34,12 @@ struct StandardRendererState
 	::Effekseer::TextureFilterType		TextureFilterType;
 	::Effekseer::TextureWrapType		TextureWrapType;
 	::Effekseer::TextureData*			TexturePtr;
+
 	::Effekseer::MaterialData*			MaterialPtr;
+	int32_t MaterialUniformCount;
+	std::array<std::array<float, 4>, 16> MaterialUniforms;
+	int32_t MaterialTextureCount;
+	std::array<::Effekseer::TextureData*, 16> MaterialTextures;
 
 	StandardRendererState()
 	{
@@ -50,6 +55,10 @@ struct StandardRendererState
 		TextureWrapType = ::Effekseer::TextureWrapType::Repeat;
 		TexturePtr = nullptr;
 		MaterialPtr = nullptr;
+
+		MaterialPtr = nullptr;
+		MaterialUniformCount = 0;
+		MaterialTextureCount = 0;
 	}
 
 	bool operator != (const StandardRendererState state)
@@ -64,6 +73,20 @@ struct StandardRendererState
 		if (TextureWrapType != state.TextureWrapType) return true;
 		if (TexturePtr != state.TexturePtr) return true;
 		if (MaterialPtr != state.MaterialPtr) return true;
+		if (MaterialUniformCount != state.MaterialUniformCount) return true;
+		if (MaterialTextureCount != state.MaterialTextureCount) return true;
+
+		for (size_t i = 0; i < state.MaterialUniformCount; i++)
+		{
+			if (MaterialUniforms[i] != state.MaterialUniforms[i])
+				return true;
+		}
+
+		for (size_t i = 0; i < state.MaterialTextureCount; i++)
+		{
+			if (MaterialTextures[i] != state.MaterialTextures[i])
+				return true;
+		}
 
 		return false;
 	}
@@ -263,31 +286,57 @@ public:
 
 		bool distortion = m_state.Distortion;
 
-		shader_ = m_renderer->GetShader(m_state.TexturePtr != nullptr, distortion);
+		if (m_state.MaterialPtr != nullptr)
+		{
+			auto shader = (SHADER*)m_state.MaterialPtr->UserPtr;
+
+			// validate
+			if (m_state.MaterialPtr->UniformCount != m_state.MaterialUniformCount)
+				return;
+
+			if
+				m_state.(m_state.TexturePtr->UniformCount != m_state.MaterialTextureCount)
+				return;
+		}
+		else
+		{
+			shader_ = m_renderer->GetShader(m_state.TexturePtr != nullptr, distortion);
+		}
 
 		m_renderer->BeginShader(shader_);
 
-		Effekseer::TextureData* textures[2];
-
-		if (m_state.TexturePtr != nullptr && m_state.TexturePtr != (Effekseer::TextureData*)0x01)
+		if (m_state.MaterialPtr != nullptr)
 		{
-			textures[0] = m_state.TexturePtr;
+			if (m_state.MaterialTextureCount > 0)
+			{
+				// TODO write it
+				assert(0);
+			}
 		}
 		else
 		{
-			textures[0] = nullptr;
-		}
+			Effekseer::TextureData* textures[2];
 
-		if (distortion)
-		{
-			textures[1] = m_renderer->GetBackground();
-			m_renderer->SetTextures(shader_, textures, 2);
-		}
-		else
-		{
-			m_renderer->SetTextures(shader_, textures, 1);
-		}
+			if (m_state.TexturePtr != nullptr && m_state.TexturePtr != (Effekseer::TextureData*)0x01)
+			{
+				textures[0] = m_state.TexturePtr;
+			}
+			else
+			{
+				textures[0] = nullptr;
+			}
 
+			if (distortion)
+			{
+				textures[1] = m_renderer->GetBackground();
+				m_renderer->SetTextures(shader_, textures, 2);
+			}
+			else
+			{
+				m_renderer->SetTextures(shader_, textures, 1);
+			}
+		}
+		
 		VertexConstantBuffer vcb;
 		vcb.constantVSBuffer[0] = mCamera;
 		vcb.constantVSBuffer[1] = mProj;
