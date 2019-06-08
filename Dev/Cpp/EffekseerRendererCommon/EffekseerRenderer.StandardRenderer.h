@@ -288,7 +288,7 @@ public:
 
 		if (m_state.MaterialPtr != nullptr)
 		{
-			auto shader = (SHADER*)m_state.MaterialPtr->UserPtr;
+			shader_ = (SHADER*)m_state.MaterialPtr->UserPtr;
 
 			// validate
 			if (m_state.MaterialPtr->UniformCount != m_state.MaterialUniformCount)

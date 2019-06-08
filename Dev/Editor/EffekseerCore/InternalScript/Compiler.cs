@@ -217,19 +217,19 @@ namespace Effekseer.InternalScript
 		bool IsValidLabel(string label)
 		{
 			HashSet<string> valid = new HashSet<string>();
-			valid.Add("$1");
-			valid.Add("$2");
-			valid.Add("$3");
-			valid.Add("$4");
+			valid.Add("@1");
+			valid.Add("@2");
+			valid.Add("@3");
+			valid.Add("@4");
 			return valid.Contains(label);
 		}
 
 		int GetInputIndex(string label)
 		{
-			if (label == "$1") return 0 + 0xfff;
-			if (label == "$2") return 1 + 0xfff;
-			if (label == "$3") return 2 + 0xfff;
-			if (label == "$4") return 3 + 0xfff;
+			if (label == "@1") return 0 + 0xfff;
+			if (label == "@2") return 1 + 0xfff;
+			if (label == "@3") return 2 + 0xfff;
+			if (label == "@4") return 3 + 0xfff;
 
 			throw new Exception();
 		}

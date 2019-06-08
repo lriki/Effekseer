@@ -76,20 +76,44 @@ protected:
 		state.Distortion = param.Distortion;
 		state.DistortionIntensity = param.DistortionIntensity;
 
-		if (param.ColorTextureIndex >= 0)
+		if (param.MaterialParameterPtr != nullptr)
 		{
-			if (state.Distortion)
+			if (param.MaterialParameterPtr->MaterialIndex >= 0)
 			{
-				state.TexturePtr = param.EffectPointer->GetDistortionImage(param.ColorTextureIndex);
-			}
-			else
-			{
-				state.TexturePtr = param.EffectPointer->GetColorImage(param.ColorTextureIndex);
+				state.MaterialPtr = param.EffectPointer->GetMaterial(param.MaterialParameterPtr->MaterialIndex);
+
+				state.MaterialUniformCount =
+					Effekseer::Min(param.MaterialParameterPtr->MaterialUniforms.size(), state.MaterialUniforms.size());
+				for (size_t i = 0; i < state.MaterialUniformCount; i++)
+				{
+					state.MaterialUniforms[i] = param.MaterialParameterPtr->MaterialUniforms[i];
+				}
+
+				state.MaterialTextureCount =
+					Effekseer::Min(param.MaterialParameterPtr->MaterialColorTextureIndexes.size(), state.MaterialTextures.size());
+				for (size_t i = 0; i < state.MaterialTextureCount; i++)
+				{
+					state.MaterialTextures[i] = param.EffectPointer->GetColorImage(param.MaterialParameterPtr->MaterialColorTextureIndexes[i]);
+				}
 			}
 		}
 		else
 		{
-			state.TexturePtr = nullptr;
+			if (param.ColorTextureIndex >= 0)
+			{
+				if (state.Distortion)
+				{
+					state.TexturePtr = param.EffectPointer->GetDistortionImage(param.ColorTextureIndex);
+				}
+				else
+				{
+					state.TexturePtr = param.EffectPointer->GetColorImage(param.ColorTextureIndex);
+				}
+			}
+			else
+			{
+				state.TexturePtr = nullptr;
+			}
 		}
 
 		renderer->GetStandardRenderer()->UpdateStateAndRenderingIfRequired(state);

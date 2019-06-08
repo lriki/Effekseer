@@ -299,6 +299,14 @@ public:
 	virtual ::Effekseer::ModelLoader* CreateModelLoader( ::Effekseer::FileInterface* fileInterface = NULL ) = 0;
 
 	/**
+	@brief	
+	\~english Create default material loader
+	\~japanese 標準のマテリアル読込クラスを生成する。
+
+	*/
+	virtual ::Effekseer::MaterialLoader* CreateMaterialLoader(::Effekseer::FileInterface* fileInterface = nullptr) = 0;
+
+	/**
 		@brief	レンダーステートを強制的にリセットする。
 	*/
 	virtual void ResetRenderState() = 0;

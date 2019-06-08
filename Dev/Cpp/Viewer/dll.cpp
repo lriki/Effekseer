@@ -427,6 +427,9 @@ bool Native::CreateWindow_Effekseer(void* pHandle, int width, int height, bool i
 			m_textureLoader = new TextureLoader((EffekseerRenderer::Renderer*)g_renderer->GetRenderer());
 			g_manager->SetTextureLoader(m_textureLoader);
 			g_manager->SetModelLoader(new ModelLoader((EffekseerRenderer::Renderer*)g_renderer->GetRenderer()));
+
+			// temp
+			g_manager->SetMaterialLoader(g_renderer->GetRenderer()->CreateMaterialLoader());
 		}
 
 		// Assign device lost events.

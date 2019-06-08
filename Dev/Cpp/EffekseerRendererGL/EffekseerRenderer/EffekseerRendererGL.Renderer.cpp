@@ -18,6 +18,7 @@
 #include "EffekseerRendererGL.ModelRenderer.h"
 #include "EffekseerRendererGL.TextureLoader.h"
 #include "EffekseerRendererGL.ModelLoader.h"
+#include "EffekseerRendererGL.MaterialLoader.h"
 
 #include "EffekseerRendererGL.GLExtension.h"
 
@@ -1006,6 +1007,14 @@ void RendererImplemented::SetCameraParameter(const ::Effekseer::Vector3D& front,
 	return new ModelLoader( fileInterface );
 #else
 	return NULL;
+#endif
+}
+
+::Effekseer::MaterialLoader* RendererImplemented::CreateMaterialLoader(::Effekseer::FileInterface* fileInterface) {
+#ifdef __EFFEKSEER_RENDERER_INTERNAL_LOADER__
+	return new MaterialLoader(this, fileInterface);
+#else
+	return nullptr;
 #endif
 }
 

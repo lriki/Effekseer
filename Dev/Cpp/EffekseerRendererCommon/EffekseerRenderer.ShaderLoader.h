@@ -70,7 +70,7 @@ public:
 		memcpy(&guid, data + offset, 8);
 		offset += sizeof(uint64_t);
 
-		while (offset < size)
+		while (0 <= offset && offset < size)
 		{
 			char chunk[5];
 			memcpy(chunk, data + offset, 4);
@@ -129,11 +129,19 @@ public:
 					Uniforms.push_back(uniform);
 				}
 
+				int codeLength = 0;
+				memcpy(&codeLength, data + offset, 4);
+				offset += sizeof(int);
+
 				auto str = std::string((const char*)(data + offset));
 				GenericCode = str;
+				offset += codeLength;
 			}
-
-			offset += chunk_size;
+			else
+			{
+				offset += chunk_size;
+				break;
+			}
 		}
 	}
 
@@ -173,13 +181,13 @@ IN mediump vec4 vaTexCoord;
 		}
 
 		auto baseCode = GenericCode;
-		Replace(baseCode, "$F1$", "float");
-		Replace(baseCode, "$F2$", "vec2");
-		Replace(baseCode, "$F3$", "vec3");
-		Replace(baseCode, "$F4$", "vec4");
-		Replace(baseCode, "$TIME$", "time");
-		Replace(baseCode, "$UV$", "vaTexCoord.xy");
-		Replace(baseCode, "$INPUT$", "");
+		baseCode = Replace(baseCode, "$F1$", "float");
+		baseCode = Replace(baseCode, "$F2$", "vec2");
+		baseCode = Replace(baseCode, "$F3$", "vec3");
+		baseCode = Replace(baseCode, "$F4$", "vec4");
+		baseCode = Replace(baseCode, "$TIME$", "time");
+		baseCode = Replace(baseCode, "$UV$", "vaTexCoord.xy");
+		baseCode = Replace(baseCode, "$INPUT$", "");
 
 		// replace textures
 		for (size_t i = 0; i < Textures.size(); i++)
@@ -188,8 +196,8 @@ IN mediump vec4 vaTexCoord;
 			std::string keyP = "$TEX_P" + std::to_string(texture.Index) + "$";
 			std::string keyS = "$TEX_S" + std::to_string(texture.Index) + "$";
 
-			Replace(baseCode, keyP, "TEX2D(" + texture.Name + ",");
-			Replace(baseCode, keyS, ")");
+			baseCode = Replace(baseCode, keyP, "TEX2D(" + texture.Name + ",");
+			baseCode = Replace(baseCode, keyS, ")");
 		}
 
 		maincode << baseCode;

@@ -1,7 +1,11 @@
-#include "EffekseerRendererGL.MaterialLoader.h"
+﻿#include "EffekseerRendererGL.MaterialLoader.h"
 #include "../EffekseerRendererCommon/EffekseerRenderer.ShaderLoader.h"
 #include "EffekseerRendererGL.Shader.h"
-#
+
+#ifdef _DEBUG
+#include <iostream>
+#endif
+
 namespace EffekseerRendererGL
 {
 
@@ -92,10 +96,14 @@ MaterialLoader ::~MaterialLoader() { ES_SAFE_RELEASE(renderer_); }
 		return nullptr;
 	}
 
+	auto shaderCode = loader.GenerateShader();
+#ifdef _DEBUG
+	std::cout << shaderCode << std::endl;
+#endif
+
 	auto materialData = new ::Effekseer::MaterialData();
 
-	auto shader = Shader::Create(
-		renderer_, g_sprite_vs_src, sizeof(g_sprite_vs_src), loader.GenericCode.c_str(), loader.GenericCode.size(), "CustomMaterial");
+	auto shader = Shader::Create(renderer_, g_sprite_vs_src, sizeof(g_sprite_vs_src), shaderCode.c_str(), shaderCode.size(), "CustomMaterial");
 
 	if (shader == nullptr)
 		return nullptr;

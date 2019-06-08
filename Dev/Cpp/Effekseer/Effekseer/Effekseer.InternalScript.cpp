@@ -1,4 +1,4 @@
-#include "Effekseer.InternalScript.h"
+﻿#include "Effekseer.InternalScript.h"
 
 namespace Effekseer
 {

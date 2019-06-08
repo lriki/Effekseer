@@ -65,8 +65,15 @@ namespace Effekseer.Binary
 				var textures = value.MaterialFile.GetTextures(materialInfo);
 				var uniforms = value.MaterialFile.GetUniforms(materialInfo);
 
-				data.Add(material_and_index[value.MaterialFile.Path.RelativePath].GetBytes());
-				
+				if(material_and_index.ContainsKey(value.MaterialFile.Path.RelativePath))
+				{
+					data.Add(material_and_index[value.MaterialFile.Path.RelativePath].GetBytes());
+				}
+				else
+				{
+					data.Add((-1).GetBytes());
+
+				}
 
 				data.Add(textures.Count.GetBytes());
 
