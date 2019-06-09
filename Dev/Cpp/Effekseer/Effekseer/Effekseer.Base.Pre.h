@@ -518,6 +518,17 @@ struct MaterialData
 };
 
 /**
+	@brief	\~english	Textures used by material
+			\~japanese	マテリアルに使用されるテクスチャ
+*/
+struct MaterialTextureParameter
+{
+	//! 0 - color, 1 - value
+	int32_t Type = 0;
+	int32_t Index = 0;
+};
+
+/**
 	@brief	\~english	Material parameter for shaders
 			\~japanese	シェーダー向けマテリアルパラメーター
 */
@@ -527,7 +538,7 @@ struct MaterialParameter
 	int32_t MaterialIndex = -1;
 
 	//! used textures in MaterialType::File
-	std::vector<int32_t> MaterialColorTextureIndexes;
+	std::vector<MaterialTextureParameter> MaterialTextures;
 
 	//! used uniforms in MaterialType::File
 	std::vector<std::array<float, 4>> MaterialUniforms;

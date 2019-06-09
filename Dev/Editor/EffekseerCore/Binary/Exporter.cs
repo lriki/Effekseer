@@ -101,12 +101,22 @@ namespace Effekseer.Binary
 
 								foreach (var texture in textures)
 								{
-									var relative_path = texture.RelativePath;
+									var relative_path = texture.Item1.RelativePath;
 									if (relative_path != string.Empty)
 									{
-										if (!UsedTextures.Contains(relative_path))
+										if(texture.Item2)
 										{
-											UsedTextures.Add(relative_path);
+											if (!UsedNormalTextures.Contains(relative_path))
+											{
+												UsedNormalTextures.Add(relative_path);
+											}
+										}
+										else
+										{
+											if (!UsedTextures.Contains(relative_path))
+											{
+												UsedTextures.Add(relative_path);
+											}
 										}
 									}
 								}
@@ -584,7 +594,7 @@ namespace Effekseer.Binary
 				node_data.Add(n.DepthValues.SoftParticle.Value.GetBytes());
 
 #if MATERIAL_ENABLED
-				node_data.Add(RendererCommonValues.GetBytes(n.RendererCommonValues, texture_and_index, distortionTexture_and_index, material_and_index));
+				node_data.Add(RendererCommonValues.GetBytes(n.RendererCommonValues, texture_and_index, normalTexture_and_index, distortionTexture_and_index, material_and_index));
 #else
 				node_data.Add(RendererCommonValues.GetBytes(n.RendererCommonValues, texture_and_index, distortionTexture_and_index));
 #endif

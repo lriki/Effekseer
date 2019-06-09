@@ -10,7 +10,7 @@ namespace Effekseer.Binary
 	class RendererCommonValues
 	{
 #if MATERIAL_ENABLED
-		public static byte[] GetBytes(Data.RendererCommonValues value, Dictionary<string, int> texture_and_index, Dictionary<string, int> distortionTexture_and_index, Dictionary<string, int> material_and_index)
+		public static byte[] GetBytes(Data.RendererCommonValues value, Dictionary<string, int> texture_and_index, Dictionary<string, int> normalTexture_and_index, Dictionary<string, int> distortionTexture_and_index, Dictionary<string, int> material_and_index)
 #else
 		public static byte[] GetBytes(Data.RendererCommonValues value, Dictionary<string, int> texture_and_index, Dictionary<string, int> distortionTexture_and_index)
 #endif
@@ -62,6 +62,7 @@ namespace Effekseer.Binary
 			{
 				var materialInfo = new Utl.MaterialInformation();
 				materialInfo.Load(value.MaterialFile.Path.AbsolutePath);
+	
 				var textures = value.MaterialFile.GetTextures(materialInfo);
 				var uniforms = value.MaterialFile.GetUniforms(materialInfo);
 
@@ -79,17 +80,39 @@ namespace Effekseer.Binary
 
 				foreach (var texture in textures)
 				{
-					if (texture.RelativePath != string.Empty &&
-	texture_and_index.ContainsKey(texture.RelativePath) &&
-	texInfo.Load(texture.AbsolutePath))
+					if(texture.Item2)
 					{
-						data.Add(texture_and_index[texture.RelativePath].GetBytes());
-						hasTexture = true;
+						if (texture.Item1.RelativePath != string.Empty &&
+normalTexture_and_index.ContainsKey(texture.Item1.RelativePath) &&
+texInfo.Load(texture.Item1.AbsolutePath))
+						{
+							data.Add((1).GetBytes());
+							data.Add(normalTexture_and_index[texture.Item1.RelativePath].GetBytes());
+							hasTexture = true;
+						}
+						else
+						{
+							data.Add((1).GetBytes());
+							data.Add((-1).GetBytes());
+							hasTexture = false;
+						}
 					}
 					else
 					{
-						data.Add((-1).GetBytes());
-						hasTexture = false;
+						if (texture.Item1.RelativePath != string.Empty &&
+texture_and_index.ContainsKey(texture.Item1.RelativePath) &&
+texInfo.Load(texture.Item1.AbsolutePath))
+						{
+							data.Add((0).GetBytes());
+							data.Add(texture_and_index[texture.Item1.RelativePath].GetBytes());
+							hasTexture = true;
+						}
+						else
+						{
+							data.Add((0).GetBytes());
+							data.Add((-1).GetBytes());
+							hasTexture = false;
+						}
 					}
 				}
 

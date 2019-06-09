@@ -90,10 +90,19 @@ protected:
 				}
 
 				state.MaterialTextureCount =
-					Effekseer::Min(param.MaterialParameterPtr->MaterialColorTextureIndexes.size(), state.MaterialTextures.size());
+					Effekseer::Min(param.MaterialParameterPtr->MaterialTextures.size(), state.MaterialTextures.size());
 				for (size_t i = 0; i < state.MaterialTextureCount; i++)
 				{
-					state.MaterialTextures[i] = param.EffectPointer->GetColorImage(param.MaterialParameterPtr->MaterialColorTextureIndexes[i]);
+					if (param.MaterialParameterPtr->MaterialTextures[i].Type == 1)
+					{
+						state.MaterialTextures[i] =
+							param.EffectPointer->GetNormalImage(param.MaterialParameterPtr->MaterialTextures[i].Index);
+					}
+					else
+					{
+						state.MaterialTextures[i] =
+							param.EffectPointer->GetColorImage(param.MaterialParameterPtr->MaterialTextures[i].Index);
+					}
 				}
 			}
 		}

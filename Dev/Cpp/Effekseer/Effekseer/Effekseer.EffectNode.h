@@ -654,9 +654,9 @@ struct ParameterRendererCommon
 				pos += sizeof(int);
 
 				
-				Material.MaterialColorTextureIndexes.resize(textures);
-				memcpy(Material.MaterialColorTextureIndexes.data(), pos, sizeof(int32_t) * textures);
-				pos += (sizeof(int32_t) * textures);
+				Material.MaterialTextures.resize(textures);
+				memcpy(Material.MaterialTextures.data(), pos, sizeof(MaterialTextureParameter) * textures);
+				pos += (sizeof(MaterialTextureParameter) * textures);
 
 				memcpy(&uniforms, pos, sizeof(int));
 				pos += sizeof(int);
