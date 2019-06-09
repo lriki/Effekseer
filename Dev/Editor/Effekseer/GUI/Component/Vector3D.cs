@@ -100,7 +100,6 @@ namespace Effekseer.GUI.Component
 
 			if (binding == null) return;
 
-#if MATERIAL_ENABLED
 			if (binding.DynamicParameter != null && binding.DynamicParameter.IsValid)
 			{
 				Manager.NativeManager.Text(binding.DynamicParameter.Name.Value);
@@ -109,7 +108,6 @@ namespace Effekseer.GUI.Component
 
 				return;
 			}
-#endif
 
 			valueChangingProp.Enable(binding);
 
@@ -151,7 +149,6 @@ namespace Effekseer.GUI.Component
 		{
 			if (isPopupShown) return;
 
-#if MATERIAL_ENABLED
 			if (Manager.NativeManager.BeginPopupContextItem(id))
 			{
 				if (Manager.NativeManager.RadioButton("Default" + id + "_1", !binding.IsDynamicParameterEnabled))
@@ -179,7 +176,7 @@ namespace Effekseer.GUI.Component
 
 				Manager.NativeManager.EndPopup();
 			}
-#endif
+
 			isPopupShown = true;
 		}
 	}

@@ -144,7 +144,6 @@ namespace Effekseer.GUI.Component
 
 			if (binding == null) return;
 
-#if MATERIAL_ENABLED
 			if (binding.IsDynamicParameterEnabled)
 			{
 				if(binding.DynamicParameterMin != null)
@@ -171,7 +170,6 @@ namespace Effekseer.GUI.Component
 
 				return;
 			}
-#endif
 
 			valueChangingProp.Enable(binding);
 

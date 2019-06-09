@@ -632,7 +632,7 @@ struct ParameterRendererCommon
 	{
 		//memset(this, 0, sizeof(ParameterRendererCommon));
 
-		if (version >= 14)
+		if (version >= 15)
 		{
 			memcpy(&MaterialType, pos, sizeof(int));
 			pos += sizeof(int);

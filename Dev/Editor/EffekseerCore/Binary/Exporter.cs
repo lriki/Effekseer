@@ -15,11 +15,11 @@ namespace Effekseer.Binary
 		/// </summary>
 		/// <remarks>
 		/// Version14
-		/// Support material
+		/// Support dynamic parameter
 		/// </remarks>
-		const int Version = 14;
+		const int Version = 15;
 #else
-		const int Version = 13;
+		const int Version = 14;
 #endif
 		public HashSet<string> UsedTextures = new HashSet<string>();
 

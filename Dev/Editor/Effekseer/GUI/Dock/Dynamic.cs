@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#if MATERIAL_ENABLED
 namespace Effekseer.GUI.Dock
 {
 	class Dynamic : DockPanel
@@ -134,4 +133,4 @@ namespace Effekseer.GUI.Dock
 		}
 	}
 }
-#endif
+

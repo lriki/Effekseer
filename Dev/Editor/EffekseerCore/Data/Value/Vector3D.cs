@@ -25,7 +25,6 @@ namespace Effekseer.Data.Value
 			private set;
 		}
 
-#if MATERIAL_ENABLED
         bool isDynamicParameterEnabled = false;
         public bool IsDynamicParameterEnabled
         {
@@ -98,8 +97,6 @@ namespace Effekseer.Data.Value
 		}
 
 		public event ChangedValueEventHandler OnChanged;
-
-#endif
 
 		public bool IsValueChangedFromDefault
 		{

@@ -33,8 +33,6 @@ namespace Effekseer.Data.Value
 
 		internal DrawnAs DefaultDrawnAs { get; private set; }
 
-
-#if MATERIAL_ENABLED
 		bool isDynamicParameterEnabled = false;
 		public bool IsDynamicParameterEnabled
 		{
@@ -144,7 +142,6 @@ namespace Effekseer.Data.Value
 
 		public event ChangedValueEventHandler OnChanged;
 
-#endif
 		public bool IsValueChangedFromDefault
 		{
 			get { return X.IsValueChangedFromDefault || Y.IsValueChangedFromDefault || Z.IsValueChangedFromDefault || DrawnAs != DefaultDrawnAs; }

@@ -544,7 +544,9 @@ namespace Effekseer.Data
 		}
 	}
 
-#if MATERIAL_ENABLED
+	/// <summary>
+	/// A class to show editable value in parameter list
+	/// </summary>
 	public class EditableValue
 	{
 		public object Value;
@@ -600,12 +602,14 @@ namespace Effekseer.Data
 			return ret;
 		}
 	}
+
+	/// <summary>
+	/// An interface to special editable parameters
+	/// </summary>
 	public interface IEditableValueCollection
 	{
 		EditableValue[] GetValues();
 
 		event ChangedValueEventHandler OnChanged;
 	}
-
-#endif
 }

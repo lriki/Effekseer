@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#if MATERIAL_ENABLED
-
 namespace Effekseer.Data
 {
 	public class DynamicInput
@@ -236,5 +234,3 @@ namespace Effekseer.Data
 		}
 	}
 }
-
-#endif

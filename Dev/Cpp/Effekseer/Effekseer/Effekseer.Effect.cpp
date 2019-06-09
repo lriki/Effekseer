@@ -473,7 +473,7 @@ bool EffectImplemented::LoadBody(uint8_t* data, int32_t size, float mag)
 		}
 	}
 
-	if (m_version >= 14)
+	if (m_version >= 15)
 	{
 		// material
 		memcpy(&materialCount_, pos, sizeof(int));
@@ -497,7 +497,10 @@ bool EffectImplemented::LoadBody(uint8_t* data, int32_t size, float mag)
 				materials_[i] = NULL;
 			}
 		}
+	}
 
+	if (m_version >= 14)
+	{
 		// dynamic parameter
 		int32_t dynamicParameterCount = 0;
 

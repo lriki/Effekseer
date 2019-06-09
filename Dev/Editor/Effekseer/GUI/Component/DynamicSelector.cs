@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Effekseer.GUI.Component
 {
-#if MATERIAL_ENABLED
 	class DynamicSelector
 	{
 		public static Data.DynamicVector Select(string paramName, string id, Data.DynamicVector currentSelected, bool hasDefault, bool showInvalid)
@@ -83,5 +82,4 @@ namespace Effekseer.GUI.Component
 			return nextSelected;
 		}
 	}
-#endif
 }
