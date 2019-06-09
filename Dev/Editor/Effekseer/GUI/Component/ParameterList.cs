@@ -321,10 +321,12 @@ namespace Effekseer.GUI.Component
 		{
 			objToTypeRow.Clear();
 
+			controlRows.Lock();
 			foreach (var row in controlRows.Internal)
 			{
 				RemoveRow(row, true);
 			}
+			controlRows.Unlock();
 		}
 
 		void RemoveRow(TypeRow row, bool removeControls)

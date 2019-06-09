@@ -1401,12 +1401,19 @@ void ManagerImplemented::UpdateHandle( DrawSet& drawSet, float deltaFrame )
 	auto e = static_cast<EffectImplemented*>(drawSet.ParameterPointer);
 	assert(e != nullptr);
 	assert(drawSet.GlobalPointer->dynamicParameters.size() >= e->dynamicParameters.size());
+
+	std::array<float, 1> globals;
+	globals[0] = drawSet.GlobalPointer->GetUpdatedFrame() / 60.0f;
+
 	for (size_t i = 0; i < e->dynamicParameters.size(); i++)
 	{
 		for (size_t j = 0; j < 4; j++)
 		{
+			if (e->dynamicParameters[i].Elements[j].GetRunningPhase() != InternalScript::RunningPhaseType::Global)
+				continue;
+
 			drawSet.GlobalPointer->dynamicParameters[i][j] =
-				e->dynamicParameters[i].Elements[j].Execute(drawSet.GlobalPointer->dynamicInputParameters);
+				e->dynamicParameters[i].Elements[j].Execute(drawSet.GlobalPointer->dynamicInputParameters, globals, std::array<float, 5>());
 		}
 	}
 

@@ -308,8 +308,13 @@ public:
 		{
 			if (m_state.MaterialTextureCount > 0)
 			{
-				// TODO write it
-				assert(0);
+				std::array<Effekseer::TextureData*, 16> textures;
+
+				for (size_t i = 0; i < Effekseer::Min(m_state.MaterialTextureCount, textures.size()); i++)
+				{
+					textures[i] = m_state.MaterialTextures[i];
+				}
+				m_renderer->SetTextures(shader_, textures.data(), Effekseer::Min(m_state.MaterialTextureCount, textures.size()));
 			}
 		}
 		else

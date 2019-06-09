@@ -17,6 +17,13 @@ namespace Effekseer.InternalScript
 		UnaryAdd = 11,
 		UnarySub = 12,
 	}
+
+	public enum RunningPhaseType : int
+	{
+		Global,
+		Local,
+	}
+
 	class Operator
 	{
 		public OperatorType Type;
@@ -28,16 +35,18 @@ namespace Effekseer.InternalScript
 	public class CompileResult
 	{
 		public byte[] Bytecode = null;
+		public RunningPhaseType RunningPhase;
 		public CompileException Error;
 	}
 	public class Compiler
 	{
 		List<Operator> operators = new List<Operator>();
+		RunningPhaseType runningPhase;
 
 		public CompileResult Compile(string code)
 		{
 			CompileResult compileResult = new CompileResult();
-
+			runningPhase = RunningPhaseType.Global;
 			operators.Clear();
 
 			if(string.IsNullOrEmpty(code))
@@ -72,80 +81,90 @@ namespace Effekseer.InternalScript
 					}
 				}
 
-				int version = 0;
-				data.Add(BitConverter.GetBytes(version));
-				data.Add(BitConverter.GetBytes(variableList.Count));
-				data.Add(BitConverter.GetBytes(operators.Count));
+				int outputIndex = -1;
 
 				// Output register
 				var outputName = GetOutputName(expr);
 				if (variableList.ContainsKey(outputName))
 				{
-					var index = variableList[outputName];
-					data.Add(BitConverter.GetBytes(index));
+					outputIndex = variableList[outputName];
 				}
 				else
 				{
-					var index = GetInputIndex(outputName);
-					data.Add(BitConverter.GetBytes(index));
+					outputIndex = GetInputIndex(outputName);
 				}
 
 				// Operators
+				List<byte[]> dataOp = new List<byte[]>();
+
 				foreach (var op in operators)
 				{
-					data.Add(BitConverter.GetBytes((int)op.Type));
-					data.Add(BitConverter.GetBytes((int)op.Inputs.Count));
+					dataOp.Add(BitConverter.GetBytes((int)op.Type));
+					dataOp.Add(BitConverter.GetBytes((int)op.Inputs.Count));
+					dataOp.Add(BitConverter.GetBytes((int)op.Outputs.Count));
+
+					// Attribute
+					if (op.Type == OperatorType.Constant)
+					{
+						dataOp.Add(BitConverter.GetBytes(1));
+					}
+					else
+					{
+						dataOp.Add(BitConverter.GetBytes(0));
+					}
 
 					foreach (var o in op.Inputs)
 					{
 						if (variableList.ContainsKey(o))
 						{
 							var index = variableList[o];
-							data.Add(BitConverter.GetBytes(index));
+							dataOp.Add(BitConverter.GetBytes(index));
 						}
 						else
 						{
 							var index = GetInputIndex(o);
-							data.Add(BitConverter.GetBytes(index));
+							dataOp.Add(BitConverter.GetBytes(index));
 						}
 					}
-
-					data.Add(BitConverter.GetBytes((int)op.Outputs.Count));
 
 					foreach (var o in op.Outputs)
 					{
 						if (variableList.ContainsKey(o))
 						{
 							var index = variableList[o];
-							data.Add(BitConverter.GetBytes(index));
+							dataOp.Add(BitConverter.GetBytes(index));
 						}
 						else
 						{
 							var index = GetInputIndex(o);
-							data.Add(BitConverter.GetBytes(index));
+							dataOp.Add(BitConverter.GetBytes(index));
 						}
 					}
 
 					// Attribute
 					if (op.Type == OperatorType.Constant)
 					{
-						data.Add(BitConverter.GetBytes(1));
 						var value = (float)op.Attributes["Constant"];
-						data.Add(BitConverter.GetBytes(value));
-					}
-					else
-					{
-						data.Add(BitConverter.GetBytes(0));
+						dataOp.Add(BitConverter.GetBytes(value));
 					}
 				}
+
+				int version = 0;
+				data.Add(BitConverter.GetBytes(version));
+				data.Add(BitConverter.GetBytes((int)runningPhase));
+				data.Add(BitConverter.GetBytes(variableList.Count));
+				data.Add(BitConverter.GetBytes(operators.Count));
+				data.Add(BitConverter.GetBytes(outputIndex));
+				data.Add(dataOp.SelectMany(_=>_).ToArray());
 			}
-			catch(CompileException e)
+			catch (CompileException e)
 			{
 				compileResult.Error = e;
 				return compileResult;
 			}
 
 			compileResult.Bytecode = data.SelectMany(_ => _).ToArray();
+			compileResult.RunningPhase = runningPhase;
 			return compileResult;
 		}
 
@@ -221,15 +240,34 @@ namespace Effekseer.InternalScript
 			valid.Add("@2");
 			valid.Add("@3");
 			valid.Add("@4");
+
+			valid.Add("@GTime");
+
+			valid.Add("@P.x");
+			valid.Add("@P.y");
+			valid.Add("@P.z");
+			valid.Add("@P.w");
+			valid.Add("@PTime");
+
 			return valid.Contains(label);
 		}
 
 		int GetInputIndex(string label)
 		{
-			if (label == "@1") return 0 + 0xfff;
-			if (label == "@2") return 1 + 0xfff;
-			if (label == "@3") return 2 + 0xfff;
-			if (label == "@4") return 3 + 0xfff;
+			if (label == "@1") return 0 + 0x1000;
+			if (label == "@2") return 1 + 0x1000;
+			if (label == "@3") return 2 + 0x1000;
+			if (label == "@4") return 3 + 0x1000;
+
+			if (label == "@GTime") return 0 + 0x1000 + 0x100;
+
+			runningPhase = RunningPhaseType.Local;
+
+			if (label == "@P.x") return 0 + 0x1000 + 0x200;
+			if (label == "@P.y") return 1 + 0x1000 + 0x200;
+			if (label == "@P.z") return 2 + 0x1000 + 0x200;
+			if (label == "@P.w") return 3 + 0x1000 + 0x200;
+			if (label == "@PTime") return 4 + 0x1000 + 0x200;
 
 			throw new Exception();
 		}

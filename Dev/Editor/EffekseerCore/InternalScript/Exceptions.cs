@@ -19,4 +19,12 @@ namespace Effekseer.InternalScript
 			private set;
 		}
 	}
+
+	public class InvalidTokenException : CompileException
+	{
+		public InvalidTokenException(string message, int line)
+			: base(message, line)
+		{
+		}
+	}
 }

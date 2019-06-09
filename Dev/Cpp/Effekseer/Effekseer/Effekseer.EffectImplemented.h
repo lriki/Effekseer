@@ -99,6 +99,7 @@ class EffectImplemented : public Effect, public ReferenceObject
 	friend class ManagerImplemented;
 	friend class EffectNodeImplemented;
 	friend class EffectFactory;
+	friend class Instance;
 
 protected:
 	ManagerImplemented* m_pManager;

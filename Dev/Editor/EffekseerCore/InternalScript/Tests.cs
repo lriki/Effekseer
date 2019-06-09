@@ -18,6 +18,13 @@ namespace Effekseer.InternalScript
 			if(!Validate(compiler.Compile("1 * 2 + 3"))) throw new Exception();
 			if (!Validate(compiler.Compile("1 * (2 + 3)"))) throw new Exception();
 			if (!Validate(compiler.Compile("@1"))) throw new Exception();
+
+			if (!Validate(compiler.Compile(".1"))) throw new Exception();
+			if (Validate(compiler.Compile("..1"))) throw new Exception();
+			if (Validate(compiler.Compile(".1.1"))) throw new Exception();
+
+			if (compiler.Compile("@P.x + @P.y").RunningPhase != RunningPhaseType.Local) throw new Exception();
+
 		}
 
 		public bool Validate(CompileResult result)

@@ -125,7 +125,7 @@ namespace Effekseer.InternalScript
 		{
 			var c = code[index];
 			var type = GetElemenetType(c);
-			return type == ElementType.Digit;
+			return type == ElementType.Digit || type == ElementType.Dot;
 		}
 
 		Token ParseLabel(string code, ref int index)
@@ -141,7 +141,7 @@ namespace Effekseer.InternalScript
 				var c = code[index];
 				var type = GetElemenetType(c);
 
-				if (type != ElementType.Alphabet && type != ElementType.Digit && type != ElementType.SpecialLetter) break;
+				if (type != ElementType.Alphabet && type != ElementType.Digit && type != ElementType.SpecialLetter && type != ElementType.Dot) break;
 
 				str += c;
 				index++;
@@ -182,6 +182,8 @@ namespace Effekseer.InternalScript
 
 			string str = "";
 
+			bool hasDot = false;
+
 			while (index < code.Length)
 			{
 				var c = code[index];
@@ -194,10 +196,19 @@ namespace Effekseer.InternalScript
 				if (type == ElementType.LeftParentheses) break;
 				if (type == ElementType.RightParentheses) break;
 
+				if(type == ElementType.Dot)
+				{
+					if(hasDot)
+					{
+						throw new InvalidTokenException(".", index);
+					}
+					hasDot = true;
+				}
+
 				str += c;
 				index++;
 			}
-
+			
 			token.Value = float.Parse(str);
 			return token;
 		}
@@ -211,6 +222,7 @@ namespace Effekseer.InternalScript
 			if (c == '(') return ElementType.LeftParentheses;
 			if (c == ')') return ElementType.RightParentheses;
 			if (c == '@') return ElementType.SpecialLetter;
+			if (c == '.') return ElementType.Dot;
 			return ElementType.Other;
 		}
 
@@ -225,6 +237,7 @@ namespace Effekseer.InternalScript
 			Other,
 			LeftParentheses,
 			RightParentheses,
+			Dot,
 		}
 	}
 }

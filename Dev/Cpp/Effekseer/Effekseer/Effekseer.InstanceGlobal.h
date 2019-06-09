@@ -27,6 +27,8 @@ class InstanceGlobal
 	: public IRandObject
 {
 	friend class ManagerImplemented;
+	friend class Instance;
+
 
 private:
 	/* このエフェクトで使用しているインスタンス数 */

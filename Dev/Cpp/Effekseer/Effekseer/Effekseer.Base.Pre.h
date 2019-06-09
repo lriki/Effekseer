@@ -113,6 +113,8 @@ typedef	void ( EFK_STDCALL *EffectInstanceRemovingCallback ) ( Manager* manager,
 #define ES_SAFE_DELETE(val)						if ( (val) != NULL ) { delete (val); (val) = NULL; }
 #define ES_SAFE_DELETE_ARRAY(val)				if ( (val) != NULL ) { delete [] (val); (val) = NULL; }
 
+#define EFK_ASSERT(x) assert(x)
+
 //----------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------

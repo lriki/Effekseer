@@ -1,4 +1,5 @@
 ﻿#include "Effekseer.InternalScript.h"
+#include <assert.h>
 
 namespace Effekseer
 {
@@ -13,16 +14,51 @@ bool InternalScript::IsValidOperator(int value) const
 	return false;
 }
 
-float InternalScript::GetRegisterValue(int index, const std::array<float, 4>& externals) const
+bool InternalScript::IsValidRegister(int index) const
 {
-	if (index < registers.size())
+	if (index < 0)
+		return false;
+
+	if (static_cast<uint32_t>(index) < registers.size())
+		return true;
+
+	if (0x1000 + 0 <= index && index <= 0x1000 + 3)
+		return true;
+
+	if (0x1000 + 0x100 + 0 <= index && index <= 0x1000 + 0x100 + 0)
+		return true;
+
+	if (0x1000 + 0x200 + 0 <= index && index <= 0x1000 + 0x200 + 4)
+		return true;
+
+	return false;
+}
+
+float InternalScript::GetRegisterValue(int index,
+									   const std::array<float, 4>& externals,
+									   const std::array<float, 1>& globals,
+									   const std::array<float, 5>& locals) const
+{
+	auto ind = static_cast<uint32_t>(index);
+	if (ind < registers.size())
 	{
-		return registers[index];
+		return registers[ind];
 	}
-	else
+	else if (0x1000 + 0 <= ind && ind <= 0x1000 + 3)
 	{
-		return externals[index - 0xfff];
+		return externals[ind - 0x1000];
 	}
+	else if (0x1000 + 0x100 + 0 <= ind && ind <= 0x1000 + 0x100 + 0)
+	{
+		return globals[ind - 0x1000 - 0x100];
+	}
+	else if (0x1000 + 0x200 + 0 <= ind && ind <= 0x1000 + 0x200 + 4)
+	{
+		return locals[ind - 0x1000 - 0x200];
+	}
+
+	assert(false);
+	return 0.0f;
 }
 
 InternalScript::InternalScript() {}
@@ -30,32 +66,32 @@ InternalScript::InternalScript() {}
 InternalScript ::~InternalScript() {}
 bool InternalScript::Load(uint8_t* data, int size)
 {
-	if (size < 16)
+	if (size < 20)
 		return false;
 
 	int32_t registerCount = 0;
 
 	memcpy(&version_, data + sizeof(int) * 0, sizeof(int));
-	memcpy(&registerCount, data + sizeof(int) * 1, sizeof(int));
-	memcpy(&operatorCount_, data + sizeof(int) * 2, sizeof(int));
-	memcpy(&outputRegister_, data + sizeof(int) * 3, sizeof(int));
+	memcpy(&runningPhase, data + sizeof(int) * 1, sizeof(int));
+	memcpy(&registerCount, data + sizeof(int) * 2, sizeof(int));
+	memcpy(&operatorCount_, data + sizeof(int) * 3, sizeof(int));
+	memcpy(&outputRegister_, data + sizeof(int) * 4, sizeof(int));
 
 	if (registerCount < 0)
 		return false;
 
 	registers.resize(registerCount);
 
-	if ((outputRegister_ < 0 || outputRegister_ >= registers.size()) && outputRegister_ != (0xfff + 0) && outputRegister_ != (0xfff + 1) &&
-		outputRegister_ != (0xfff + 2) && outputRegister_ != (0xfff + 3))
+	if (!IsValidRegister(outputRegister_))
 	{
 		return false;
 	}
 
-	operators.resize(size - 16);
-	memcpy(operators.data(), data + sizeof(int) * 4, size - 16);
+	operators.resize(size - 20);
+	memcpy(operators.data(), data + sizeof(int) * 5, size - 20);
 
 	// check operators
-	int offset = 0;
+	uint32_t offset = 0;
 	for (int i = 0; i < operatorCount_; i++)
 	{
 		// type
@@ -69,7 +105,7 @@ bool InternalScript::Load(uint8_t* data, int size)
 		if (!IsValidOperator((int)type))
 			return false;
 
-		// input
+		// counter
 		if (offset + 4 > operators.size())
 			return false;
 
@@ -77,6 +113,21 @@ bool InternalScript::Load(uint8_t* data, int size)
 		memcpy(&inputCount, operators.data() + offset, sizeof(int));
 		offset += sizeof(int);
 
+		if (offset + 4 > operators.size())
+			return false;
+
+		int32_t outputCount = 0;
+		memcpy(&outputCount, operators.data() + offset, sizeof(int));
+		offset += sizeof(int);
+
+		if (offset + 4 > operators.size())
+			return false;
+
+		int32_t attributeCount = 0;
+		memcpy(&attributeCount, operators.data() + offset, sizeof(int));
+		offset += sizeof(int);
+
+		// input
 		for (int j = 0; j < inputCount; j++)
 		{
 			if (offset + 4 > operators.size())
@@ -85,21 +136,13 @@ bool InternalScript::Load(uint8_t* data, int size)
 			memcpy(&index, operators.data() + offset, sizeof(int));
 			offset += sizeof(int);
 
-			if ((index < 0 || index >= registers.size()) && index != (0xfff + 0) && index != (0xfff + 1) && index != (0xfff + 2) &&
-				index != (0xfff + 3))
+			if (!IsValidRegister(index))
 			{
 				return false;
 			}
 		}
 
 		// output
-		if (offset + 4 > operators.size())
-			return false;
-
-		int32_t outputCount = 0;
-		memcpy(&outputCount, operators.data() + offset, sizeof(int));
-		offset += sizeof(int);
-
 		for (int j = 0; j < outputCount; j++)
 		{
 			if (offset + 4 > operators.size())
@@ -115,13 +158,6 @@ bool InternalScript::Load(uint8_t* data, int size)
 		}
 
 		// attribute
-		if (offset + 4 > operators.size())
-			return false;
-
-		int32_t attributeCount = 0;
-		memcpy(&attributeCount, operators.data() + offset, sizeof(int));
-		offset += sizeof(int);
-
 		for (int j = 0; j < attributeCount; j++)
 		{
 			if (offset + 4 > operators.size())
@@ -140,7 +176,9 @@ bool InternalScript::Load(uint8_t* data, int size)
 	return true;
 }
 
-float InternalScript::Execute(const std::array<float, 4>& externals)
+float InternalScript::Execute(const std::array<float, 4>& externals,
+							  const std::array<float, 1>& globals,
+							  const std::array<float, 5>& locals)
 {
 	if (!isValid_)
 		return 0.0f;
@@ -157,28 +195,35 @@ float InternalScript::Execute(const std::array<float, 4>& externals)
 		memcpy(&inputCount, operators.data() + offset, sizeof(int));
 		offset += sizeof(int);
 
+		int32_t outputCount = 0;
+		memcpy(&outputCount, operators.data() + offset, sizeof(int));
+		offset += sizeof(int);
+
+		int32_t attributeCount = 0;
+		memcpy(&attributeCount, operators.data() + offset, sizeof(int));
+		offset += sizeof(int);
+
+		auto inputOffset = offset;
+		auto outputOffset = inputOffset + inputCount * sizeof(int);
+		auto attributeOffset = outputOffset + outputCount * sizeof(int);
+		offset = attributeOffset + attributeCount * sizeof(int);
+
 		std::array<float, 4> tempInputs;
 
 		for (int j = 0; j < inputCount; j++)
 		{
 			int index = 0;
-			memcpy(&index, operators.data() + offset, sizeof(int));
-			offset += sizeof(int);
+			memcpy(&index, operators.data() + inputOffset, sizeof(int));
+			inputOffset += sizeof(int);
 
-			tempInputs[j] = GetRegisterValue(outputRegister_, externals);
+			tempInputs[j] = GetRegisterValue(index, externals, globals, locals);
 		}
-
-		int32_t outputCount = 0;
-		memcpy(&outputCount, operators.data() + offset, sizeof(int));
-		offset += sizeof(int);
-
-		int outputIndex = -1;
 
 		for (int j = 0; j < outputCount; j++)
 		{
 			int index = 0;
-			memcpy(&index, operators.data() + offset, sizeof(int));
-			offset += sizeof(int);
+			memcpy(&index, operators.data() + outputOffset, sizeof(int));
+			outputOffset += sizeof(int);
 
 			if (type == OperatorType::Add)
 				registers[index] = tempInputs[0] + tempInputs[1];
@@ -191,27 +236,17 @@ float InternalScript::Execute(const std::array<float, 4>& externals)
 			else if (type == OperatorType::UnaryAdd)
 				registers[index] = tempInputs[0];
 			else if (type == OperatorType::UnarySub)
-				registers[index] = - tempInputs[0];
+				registers[index] = -tempInputs[0];
 			else if (type == OperatorType::Constant)
-				outputIndex = index;
-		}
-
-		int32_t attributeCount = 0;
-		memcpy(&attributeCount, operators.data() + offset, sizeof(int));
-		offset += sizeof(int);
-
-		for (int j = 0; j < attributeCount; j++)
-		{
-			float att = 0;
-			memcpy(&att, operators.data() + offset, sizeof(int));
-			offset += sizeof(int);
-
-			if (type == OperatorType::Constant)
-				registers[outputIndex] = att;
+			{
+				float att = 0;
+				memcpy(&att, operators.data() + attributeOffset, sizeof(int));
+				registers[index] = att;
+			}
 		}
 	}
 
-	return GetRegisterValue(outputRegister_, externals);
+	return GetRegisterValue(outputRegister_, externals, globals, locals);
 }
 
 } // namespace Effekseer
